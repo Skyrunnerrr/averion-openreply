@@ -4,7 +4,7 @@
     "UPSTREAM_PIN": "5760181c4bb9683241357cbbcd8ca635d19f835a",
     "HARDENING_BASE_SHA": "727d364cbc7ac6fb9ce1825c3c43599a0e1a7b10",
     "APP_RUNTIME_SOURCE_SHA": "ea2b1c6e0a88eaeb0fa3daefaf0b0f869bb7566c",
-    "BUILD_DEFINITION_SHA": null,
+    "BUILD_DEFINITION_SHA": "6bfff79d4cf4e739bb0795f98a3ab29fbfb2d859",
     "DEPLOYMENT_BUNDLE_SHA": null
   },
   "rules": [

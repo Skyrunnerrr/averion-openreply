@@ -7,8 +7,8 @@ Five SHA authorities stay distinct. Names and values are in `averion/deploy/prov
 | UPSTREAM_PIN | `5760181c4bb9683241357cbbcd8ca635d19f835a` | Upstream OpenReply pin. Verified on this branch as `main`. |
 | HARDENING_BASE_SHA | `727d364cbc7ac6fb9ce1825c3c43599a0e1a7b10` | Hardening base. Historical image only. |
 | APP_RUNTIME_SOURCE_SHA | `ea2b1c6e0a88eaeb0fa3daefaf0b0f869bb7566c` | Historical git archive inside the recorded runner image. A later Next bump creates a new one. |
-| BUILD_DEFINITION_SHA | Assigned when the RC2.2A canonical builder commit lands | Builder definition. Not the app runtime source. |
-| DEPLOYMENT_BUNDLE_SHA | Assigned when the RC2.2A dossier commit lands | Docs and evidence. Not the app runtime source. |
+| BUILD_DEFINITION_SHA | `6bfff79d4cf4e739bb0795f98a3ab29fbfb2d859` | Canonical builder definition. Not the app runtime source. |
+| DEPLOYMENT_BUNDLE_SHA | The RC2.2A dossier commit. A later stamp records its id. | Docs and evidence. Not the app runtime source. |
 
 `OPENREPLY_IMAGE_REPRODUCIBLE=YES` was recorded for app image source `ea2b1c6e0a88eaeb0fa3daefaf0b0f869bb7566c` under the previous builder. That claim is historical. The permitted claim for the RC2.2A builder is `REPRODUCIBLE_WITH_PINNED_CANONICAL_BUILDER`. It is not `BIT_REPRODUCIBLE_ACROSS_ARBITRARY_BUILDERS`. Digests from that earlier pair are not canonical.
 
