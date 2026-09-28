@@ -1,0 +1,78 @@
+{
+  "liveInfra": "SIMULATED",
+  "note": "Fixture values are not credentials and were not injected into a running service.",
+  "cases": [
+    {
+      "name": "provider-contract",
+      "expectReady": true,
+      "ready": true,
+      "failures": [],
+      "pass": true
+    },
+    {
+      "name": "empty-allowlist",
+      "expectReady": false,
+      "ready": false,
+      "failures": [
+        "ALLOWED_EMAILS is missing",
+        "ALLOWED_EMAILS must be a non-empty allowlist"
+      ],
+      "pass": true
+    },
+    {
+      "name": "automations-enabled",
+      "expectReady": false,
+      "ready": false,
+      "failures": [
+        "OPENREPLY_AUTOMATIONS_ENABLED must be false"
+      ],
+      "pass": true
+    },
+    {
+      "name": "human-send-enabled",
+      "expectReady": false,
+      "ready": false,
+      "failures": [
+        "OPENREPLY_HUMAN_SEND_ENABLED must be false"
+      ],
+      "pass": true
+    },
+    {
+      "name": "upstream-profile",
+      "expectReady": false,
+      "ready": false,
+      "failures": [
+        "OPENREPLY_PROVIDER_PROFILE must be averion"
+      ],
+      "pass": true
+    },
+    {
+      "name": "placeholder-secret",
+      "expectReady": false,
+      "ready": false,
+      "failures": [
+        "WEBHOOK_VERIFY_TOKEN still has a placeholder value"
+      ],
+      "pass": true
+    },
+    {
+      "name": "cron-secret-reused",
+      "expectReady": false,
+      "ready": false,
+      "failures": [
+        "CRON_SECRET must not equal NEXTAUTH_SECRET"
+      ],
+      "pass": true
+    },
+    {
+      "name": "localhost-database",
+      "expectReady": false,
+      "ready": false,
+      "failures": [
+        "DATABASE_URL must use the private compose hostname, not localhost"
+      ],
+      "pass": true
+    }
+  ],
+  "pass": true
+}

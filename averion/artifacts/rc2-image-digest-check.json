@@ -1,0 +1,41 @@
+{
+  "kind": "RC2_IMAGE_DIGEST_CHECK",
+  "stopReason": "IMAGE_PROVENANCE_MISMATCH",
+  "appImageRebuildRequired": "NO",
+  "appImageRebuildRequiredReason": "RC2 edits are provenance documents, ingress and egress metadata, and this evidence file. The runner image is a git archive of appImageSourceSha plus pin-next-build.mjs and normalize-next-output.mjs from that same commit. Those scripts were not edited. ingress-edge.mjs and compose.provider.yml were not edited.",
+  "expected": {
+    "appImageSourceSha": "ea2b1c6e0a88eaeb0fa3daefaf0b0f869bb7566c",
+    "ociManifestDigest": "sha256:8f44fe4f707ff86993d93ad222bafdaf3a314fbf704e33cfd64a433042f24b23",
+    "configDigest": "sha256:833ffa4b7b0420fa3fa10078215c55f5d3bd7105be7fb0f256ddfa4c8aa18cc2",
+    "lockfileSha256": "df7f69b394d4fd22a076448b86a6ef0a489d240259661fd07105e76ade389416"
+  },
+  "materialization": {
+    "builder": "podman",
+    "podmanVersion": "4.9.3",
+    "isolation": "chroot",
+    "noCache": true,
+    "timestamp": 1790583091,
+    "source": "git archive of ea2b1c6e0a88eaeb0fa3daefaf0b0f869bb7566c",
+    "dockerfile": "averion/deploy/Dockerfile",
+    "buildContextExtra": "averion/deploy at the same commit",
+    "lockfileCheck": "package-lock.json: OK",
+    "npmCi": "added 568 packages",
+    "buildIdInsideImage": "ea2b1c6e0a88eaeb0fa3daefaf0b0f869bb7566c",
+    "guardPresent": true,
+    "guardLine": 33,
+    "labelRevision": "ea2b1c6e0a88eaeb0fa3daefaf0b0f869bb7566c",
+    "labelLockfileSha256": "df7f69b394d4fd22a076448b86a6ef0a489d240259661fd07105e76ade389416",
+    "configCreated": "2026-09-28T08:11:31Z",
+    "ociManifestDigest": "sha256:3ceb571affcaa615be4d5761ae32c03e508f6010e159bfc7dee179dd0019a46c",
+    "configDigest": "sha256:e74bf11948440df687d48ad15f6232f62eb07e865a994e338fb30b326866a2e4",
+    "podmanInspectDigest": "sha256:d23b444567556942ff07d6c534e42cb7acd8901d7c71537e91c7e268d98ffcc6",
+    "digestMatch": false
+  },
+  "ociIsolationAttempt": {
+    "isolation": "oci",
+    "result": "npm ci printed Exit handler never called and the layer was still committed. prisma was not on PATH at npm run build. That image was not pushed and was not used."
+  },
+  "composeProof": "NOT_RUN",
+  "cleanRoomCi": "NOT_RUN",
+  "note": "The recorded digest was not reproduced. Compose was not started with a different image."
+}

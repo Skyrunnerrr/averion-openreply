@@ -1,0 +1,22 @@
+# E2E harness layered on compose.provider.yml.
+# Swaps the unpublished release-candidate image for a source-mounted process
+# that executes app/api/webhook/route.ts. It does not publish web, postgres,
+# or redis, and it does not change the public-edge listener.
+# The proof script applies prisma/migrations through psql. The slim node image
+# cannot install OpenSSL here, and the Prisma schema engine needs it.
+
+services:
+  web:
+    image: docker.io/library/node@sha256:3d0f05455dea2c82e2f76e7e2543964c30f6b7d673fc1a83286736d44fe4c41c
+    working_dir: /workspace
+    command:
+      - sh
+      - -c
+      - node /config/check-readiness.mjs && npx tsx averion/deploy/openreply-webhook-upstream.ts
+    volumes:
+      - ./check-readiness.mjs:/config/check-readiness.mjs:ro
+      - ../..:/workspace
+    environment:
+      PORT: "3000"
+      BIND: 0.0.0.0
+      HITS_PATH: /tmp/openreply-upstream-hits.jsonl

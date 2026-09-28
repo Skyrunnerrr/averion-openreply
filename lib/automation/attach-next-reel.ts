@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db/client";
+import { areAutomationsEnabled } from "@/lib/provider-controls";
 import {
   createInstagramContext,
   hasInstagramCredentials,
@@ -26,6 +27,12 @@ export async function attachPendingNextReels(): Promise<AttachNextReelResult> {
     where: { pendingNextReel: true },
     include: { instagramAccount: true },
   });
+
+  // Fail closed before any Instagram client is constructed. A pendingNextReel
+  // row must not become a Graph fetch while automations are disabled.
+  if (!areAutomationsEnabled()) {
+    return { checked: pending.length, bound: 0, failedAccounts: 0 };
+  }
 
   // Group by connected account so we fetch each account's media only once.
   const byAccount = new Map<

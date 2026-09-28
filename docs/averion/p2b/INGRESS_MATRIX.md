@@ -1,0 +1,87 @@
+# Ingress matrix
+
+Source of truth: `averion/deploy/ingress-policy.json`.
+Every app route file and public file is listed. Unmatched paths are DENY.
+Listeners: `public` accepts only PUBLIC_REQUIRED, `private` accepts only PRIVATE_SERVICE, `ops` accepts only OPS_ONLY.
+A route with classification DENY has no listener.
+
+The running public edge is a reverse proxy, not a 204 oracle. `ALLOW` forwards the original method, query string, headers, and raw body to `web:3000`. `DENY` is HTTP 403 and is not forwarded. The edge does not verify `x-hub-signature-256`. OpenReply still does that on `POST /api/webhook`. Only the public listener is published.
+
+| id | methods | pattern | classification | listeners | source |
+| --- | --- | --- | --- | --- | --- |
+| meta-webhook-verify | GET,HEAD | `/api/webhook` | PUBLIC_REQUIRED | public | `app/api/webhook/route.ts` |
+| meta-webhook-events | POST | `/api/webhook` | PUBLIC_REQUIRED | public | `app/api/webhook/route.ts` |
+| health | GET,HEAD | `/api/health` | OPS_ONLY | ops | `app/api/health/route.ts` |
+| admin-diagnostics-api | GET,HEAD | `/api/admin/diagnostics` | OPS_ONLY | ops | `app/api/admin/diagnostics/route.ts` |
+| diagnostics-page | GET,HEAD | `/diagnostics` | OPS_ONLY | ops | `app/(dashboard)/diagnostics/page.tsx` |
+| auth | GET,HEAD,POST | `/api/auth/:path*` | PRIVATE_SERVICE | private | `app/api/auth/[...nextauth]/route.ts` |
+| login | GET,HEAD | `/login` | PRIVATE_SERVICE | private | `app/login/page.tsx` |
+| verify-request | GET,HEAD | `/verify-request` | PRIVATE_SERVICE | private | `app/verify-request/page.tsx` |
+| dashboard | GET,HEAD | `/dashboard` | PRIVATE_SERVICE | private | `app/(dashboard)/dashboard/page.tsx` |
+| overview | GET,HEAD | `/overview` | PRIVATE_SERVICE | private | `app/(dashboard)/overview/page.tsx` |
+| automations-page | GET,HEAD | `/automations` | PRIVATE_SERVICE | private | `app/(dashboard)/automations/page.tsx` |
+| automations-new-page | GET,HEAD | `/automations/new` | DENY | — | `app/(dashboard)/automations/new/page.tsx` |
+| campaigns-page | GET,HEAD | `/campaigns` | PRIVATE_SERVICE | private | `app/(dashboard)/campaigns/page.tsx` |
+| campaigns-new-page | GET,HEAD | `/campaigns/new` | DENY | — | `app/(dashboard)/campaigns/new/page.tsx` |
+| campaigns-import-page | GET,HEAD | `/campaigns/import` | DENY | — | `app/(dashboard)/campaigns/import/page.tsx` |
+| campaigns-edit-page | GET,HEAD | `/campaigns/:id/edit` | DENY | — | `app/(dashboard)/campaigns/[id]/edit/page.tsx` |
+| campaigns-detail-page | GET,HEAD | `/campaigns/:id` | PRIVATE_SERVICE | private | `app/(dashboard)/campaigns/[id]/page.tsx` |
+| inbox-page | GET,HEAD | `/inbox` | DENY | — | `app/(dashboard)/inbox/page.tsx` |
+| logs-page | GET,HEAD | `/logs` | PRIVATE_SERVICE | private | `app/(dashboard)/logs/page.tsx` |
+| settings-page | GET,HEAD | `/settings` | PRIVATE_SERVICE | private | `app/(dashboard)/settings/page.tsx` |
+| invite-page | GET,HEAD | `/invite/:token` | PRIVATE_SERVICE | private | `app/invite/[token]/page.tsx` |
+| marketing-home | GET,HEAD | `/` | DENY | — | `app/page.tsx` |
+| marketing-comment-link | GET,HEAD | `/comment-link-automation` | DENY | — | `app/comment-link-automation/page.tsx` |
+| marketing-data-deletion | GET,HEAD | `/data-deletion` | DENY | — | `app/data-deletion/page.tsx` |
+| marketing-ig-templates | GET,HEAD | `/instagram-comment-to-dm-templates` | DENY | — | `app/instagram-comment-to-dm-templates/page.tsx` |
+| marketing-agencies | GET,HEAD | `/instagram-dm-automation-agencies` | DENY | — | `app/instagram-dm-automation-agencies/page.tsx` |
+| marketing-manychat | GET,HEAD | `/manychat-alternative` | DENY | — | `app/manychat-alternative/page.tsx` |
+| marketing-meta-review | GET,HEAD | `/meta-review` | DENY | — | `app/meta-review/page.tsx` |
+| privacy | GET,HEAD | `/privacy` | DENY | — | `app/privacy/page.tsx` |
+| terms | GET,HEAD | `/terms` | DENY | — | `app/terms/page.tsx` |
+| templates | GET,HEAD | `/templates` | DENY | — | `app/templates/page.tsx` |
+| templates-slug | GET,HEAD | `/templates/:slug` | DENY | — | `app/templates/[slug]/page.tsx` |
+| reports-share | GET,HEAD | `/reports/:shareSlug` | DENY | — | `app/reports/[shareSlug]/page.tsx` |
+| tracked-link | GET,HEAD | `/r/:slug` | DENY | — | `app/r/[slug]/route.ts` |
+| ig-overview | GET,HEAD | `/api/instagram/overview` | PRIVATE_SERVICE | private | `app/api/instagram/overview/route.ts` |
+| ig-conversations-read | GET,HEAD | `/api/instagram/conversations` | PRIVATE_SERVICE | private | `app/api/instagram/conversations/route.ts` |
+| ig-conversations-send | POST | `/api/instagram/conversations` | DENY | — | `app/api/instagram/conversations/route.ts` |
+| ig-conversation-read | GET,HEAD | `/api/instagram/conversations/:id` | PRIVATE_SERVICE | private | `app/api/instagram/conversations/[id]/route.ts` |
+| dashboard-stats | GET,HEAD | `/api/dashboard/stats` | PRIVATE_SERVICE | private | `app/api/dashboard/stats/route.ts` |
+| automations-read | GET,HEAD | `/api/automations` | PRIVATE_SERVICE | private | `app/api/automations/route.ts` |
+| automations-create | POST | `/api/automations` | DENY | — | `app/api/automations/route.ts` |
+| automations-patch | PATCH | `/api/automations` | DENY | — | `app/api/automations/route.ts` |
+| automations-delete | DELETE | `/api/automations` | DENY | — | `app/api/automations/route.ts` |
+| automations-import | POST | `/api/automations/import` | DENY | — | `app/api/automations/import/route.ts` |
+| automations-duplicate | POST | `/api/automations/duplicate` | DENY | — | `app/api/automations/duplicate/route.ts` |
+| zernio-webhook | POST | `/api/zernio/webhook/:workspaceId` | DENY | — | `app/api/zernio/webhook/[workspaceId]/route.ts` |
+| zernio-connect | POST | `/api/zernio/connect` | DENY | — | `app/api/zernio/connect/route.ts` |
+| zernio-settings | GET,HEAD,POST,PUT,DELETE | `/api/zernio/settings` | DENY | — | `app/api/zernio/settings/route.ts` |
+| zernio-accounts | POST | `/api/zernio/accounts` | DENY | — | `app/api/zernio/accounts/route.ts` |
+| workspace-members-read | GET,HEAD | `/api/workspace/members` | PRIVATE_SERVICE | private | `app/api/workspace/members/route.ts` |
+| workspace-members-write | POST,PATCH,DELETE | `/api/workspace/members` | PRIVATE_SERVICE | private | `app/api/workspace/members/route.ts` |
+| workspace-invite-accept | POST | `/api/workspace/invitations/accept` | PRIVATE_SERVICE | private | `app/api/workspace/invitations/accept/route.ts` |
+| ig-connect | GET,HEAD | `/api/instagram/connect` | PRIVATE_SERVICE | private | `app/api/instagram/connect/route.ts` |
+| ig-callback | GET,HEAD | `/api/instagram/callback` | PRIVATE_SERVICE | private | `app/api/instagram/callback/route.ts` |
+| ig-posts | GET,HEAD | `/api/instagram/posts` | PRIVATE_SERVICE | private | `app/api/instagram/posts/route.ts` |
+| ig-profile | GET,HEAD | `/api/instagram/profile` | PRIVATE_SERVICE | private | `app/api/instagram/profile/route.ts` |
+| ig-accounts | GET,HEAD | `/api/instagram/accounts` | PRIVATE_SERVICE | private | `app/api/instagram/accounts/route.ts` |
+| ig-disconnect | POST | `/api/instagram/disconnect` | PRIVATE_SERVICE | private | `app/api/instagram/disconnect/route.ts` |
+| logs-api | GET,HEAD | `/api/logs` | PRIVATE_SERVICE | private | `app/api/logs/route.ts` |
+| cron-refresh-tokens | GET,HEAD | `/api/cron/refresh-tokens` | PRIVATE_SERVICE | private | `app/api/cron/refresh-tokens/route.ts` |
+| cron-attach-next-reel | GET,HEAD | `/api/cron/attach-next-reel` | PRIVATE_SERVICE | private | `app/api/cron/attach-next-reel/route.ts` |
+| cron-snapshot-followers | GET,HEAD | `/api/cron/snapshot-followers` | PRIVATE_SERVICE | private | `app/api/cron/snapshot-followers/route.ts` |
+| next-static | GET,HEAD | `/_next/:path*` | PRIVATE_SERVICE | private | `next:runtime` |
+| vercel-insights | GET,HEAD,POST | `/_vercel/:path*` | DENY | — | `next:runtime` |
+| asset-font | GET,HEAD | `/fonts/:path*` | PRIVATE_SERVICE | private | `public/fonts/geist-latin.woff2` |
+| asset-icon-192 | GET,HEAD | `/icon-192.png` | PRIVATE_SERVICE | private | `public/icon-192.png` |
+| asset-icon-512 | GET,HEAD | `/icon-512.png` | PRIVATE_SERVICE | private | `public/icon-512.png` |
+| asset-apple-touch | GET,HEAD | `/apple-touch-icon.png` | PRIVATE_SERVICE | private | `public/apple-touch-icon.png` |
+| asset-brand | GET,HEAD | `/brand/:path*` | DENY | — | `public/brand/zernio-primary.svg` |
+| asset-file-svg | GET,HEAD | `/file.svg` | DENY | — | `public/file.svg` |
+| asset-globe | GET,HEAD | `/globe.svg` | DENY | — | `public/globe.svg` |
+| asset-next-svg | GET,HEAD | `/next.svg` | DENY | — | `public/next.svg` |
+| asset-star-history | GET,HEAD | `/star-history.png` | DENY | — | `public/star-history.png` |
+| asset-vercel | GET,HEAD | `/vercel.svg` | DENY | — | `public/vercel.svg` |
+| asset-window | GET,HEAD | `/window.svg` | DENY | — | `public/window.svg` |
+| font-license | GET,HEAD | `/fonts/Geist-LICENSE.txt` | PRIVATE_SERVICE | private | `public/fonts/Geist-LICENSE.txt` |
