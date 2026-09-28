@@ -7,29 +7,43 @@
   "lockfileCheck": "package-lock.json: OK",
   "buildContext": "git archive of sourceSha",
   "dockerfile": "averion/deploy/Dockerfile",
+  "extraBuildContext": "averion/deploy",
   "baseImage": "docker.io/library/node@sha256:3d0f05455dea2c82e2f76e7e2543964c30f6b7d673fc1a83286736d44fe4c41c",
   "sourceDateEpoch": 1790583091,
   "imageCreated": "2026-09-28T08:11:31Z",
-  "buildWallClock": {
-    "start": "2026-09-28T08:20:51Z",
-    "end": "2026-09-28T08:21:54Z"
+  "buildArgs": {
+    "SOURCE_SHA": "727d364cbc7ac6fb9ce1825c3c43599a0e1a7b10",
+    "LOCKFILE_SHA256": "df7f69b394d4fd22a076448b86a6ef0a489d240259661fd07105e76ade389416",
+    "SOURCE_DATE_EPOCH": "1790583091"
   },
-  "imageDigest": "sha256:07e3d86d164a5afe0548e1cc34a60f01632c20009162a03992b17bb58a01243d",
+  "determinism": {
+    "generateBuildId": "SOURCE_SHA",
+    "nextTelemetryDisabled": "1",
+    "serverActionsEncryptionKey": "base64(sha256(\"averion-openreply-p2b-\" + SOURCE_SHA))",
+    "previewKeys": "sha256(SOURCE_SHA + label) truncated in averion/deploy/normalize-next-output.mjs",
+    "githubStars": "api.github.com forced to 0.0.0.0 during next build",
+    "aptLogsRemoved": true,
+    "experimentalCpus": 1
+  },
+  "buildWallClock": {
+    "firstStart": "2026-09-28T08:42:26Z",
+    "secondStart": "2026-09-28T08:43:31Z",
+    "end": "2026-09-28T08:44:30Z"
+  },
+  "imageDigest": "sha256:4ba1cb451075e593880ca1f760c913134537a64e26ad0e2bd5c28d1929ffe677",
   "imageDigestKind": "oci-manifest",
-  "configDigest": "sha256:908ac1b39fdd9ee58e453029a4ec169ab66ec0a20dd174474e14c138bb7ae175",
-  "podmanStorageDigest": "sha256:f597d5f092353acbe48c8444afa3af0f8e8e9ae532b2ecb72af2f628d2e0ad82",
+  "configDigest": "sha256:6703eab9533313c827f22ff7f6d6df84df6599f8884b82ffb50906e2a14d737a",
+  "podmanStorageDigest": "sha256:ef12e3bc70f64fa27b254a61859d20ee11584224dfd13da0a3fd395a08a32791",
   "registryPush": false,
-  "rebuild": {
+  "reproducibleBuilds": {
     "noCache": true,
     "sameSourceDateEpoch": true,
-    "ociManifestDigest": "sha256:fee2cbf2a4160dffbb469de9b15417bec7bf7e4adab2f5c55e62e4cbbd03329b",
-    "matchesFirstDigest": false,
-    "nodeModulesLayerMatched": true,
-    "differingLayers": [
-      "apt logs and ldconfig aux-cache (var/log/apt/history.log, var/log/apt/term.log, var/log/dpkg.log, var/cache/ldconfig/aux-cache)",
-      ".next build id and chunk hashes"
-    ]
+    "firstOciManifestDigest": "sha256:4ba1cb451075e593880ca1f760c913134537a64e26ad0e2bd5c28d1929ffe677",
+    "secondOciManifestDigest": "sha256:4ba1cb451075e593880ca1f760c913134537a64e26ad0e2bd5c28d1929ffe677",
+    "match": true,
+    "buildIdInsideImage": "727d364cbc7ac6fb9ce1825c3c43599a0e1a7b10"
   },
+  "previousNonReproducibleDigest": "sha256:07e3d86d164a5afe0548e1cc34a60f01632c20009162a03992b17bb58a01243d",
   "sbom": {
     "path": "averion/artifacts/sbom.cdx.json",
     "format": "CycloneDX",

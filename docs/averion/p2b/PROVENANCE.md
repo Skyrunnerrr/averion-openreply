@@ -11,9 +11,9 @@
 | Base image | `docker.io/library/node@sha256:3d0f05455dea2c82e2f76e7e2543964c30f6b7d673fc1a83286736d44fe4c41c` (`node:20-slim` linux/amd64 at resolution time) |
 | SOURCE_DATE_EPOCH | `1790583091` (commit time `2026-09-28T08:11:31Z`) |
 | BUILD_TIMESTAMP | recorded in `averion/artifacts/image-provenance.json` as the wall clock of the build |
-| IMAGE_DIGEST | OCI manifest `sha256:07e3d86d164a5afe0548e1cc34a60f01632c20009162a03992b17bb58a01243d` |
-| Config digest | `sha256:908ac1b39fdd9ee58e453029a4ec169ab66ec0a20dd174474e14c138bb7ae175` |
-| Local podman digest | `sha256:f597d5f092353acbe48c8444afa3af0f8e8e9ae532b2ecb72af2f628d2e0ad82` |
+| IMAGE_DIGEST | OCI manifest `sha256:4ba1cb451075e593880ca1f760c913134537a64e26ad0e2bd5c28d1929ffe677` |
+| Config digest | `sha256:6703eab9533313c827f22ff7f6d6df84df6599f8884b82ffb50906e2a14d737a` |
+| Local podman digest | `sha256:ef12e3bc70f64fa27b254a61859d20ee11584224dfd13da0a3fd395a08a32791` |
 
 The build runs `sha256sum -c` on `package-lock.json` before `npm ci`. The log line is `package-lock.json: OK`.
 
@@ -27,4 +27,8 @@ License manifest: `averion/artifacts/license-manifest.json`. Project license is 
 
 Postgres and Redis references are the linux/amd64 manifest digests in `averion/deploy/base-image-pins.json`. The mutable tags `postgres:16`, `redis:7-alpine`, and `node:20-slim` are not used by the provider compose file or the deploy Dockerfile.
 
-A second `--no-cache` build from the same archive and the same `SOURCE_DATE_EPOCH` produced OCI manifest `sha256:fee2cbf2a4160dffbb469de9b15417bec7bf7e4adab2f5c55e62e4cbbd03329b`. It does not match the first digest. The `node_modules` layer matched. The apt layer differed in `var/log/apt/history.log`, `var/log/apt/term.log`, `var/log/dpkg.log`, and `var/cache/ldconfig/aux-cache`. The `.next` layer differed in `BUILD_ID` and chunk hashes. `PROVIDER_IMAGES_REPRODUCIBLE=FAIL` for the app image. The pinned Postgres, Redis, and Node base digests did re-fetch to the same digest.
+Two `--no-cache` builds from a clean `git archive` of SOURCE_SHA, with `SOURCE_DATE_EPOCH=1790583091` and the same build args, both produced OCI manifest `sha256:4ba1cb451075e593880ca1f760c913134537a64e26ad0e2bd5c28d1929ffe677`. The blob hash matches that digest. `.next/BUILD_ID` inside the image is the source SHA. `PROVIDER_IMAGES_REPRODUCIBLE=PASS`.
+
+The image build pins `generateBuildId` to SOURCE_SHA, sets `NEXT_TELEMETRY_DISABLED=1`, sets `experimental.cpus` to 1, and sets `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` to `base64(sha256("averion-openreply-p2b-" + SOURCE_SHA))`. That key is a public determinism constant, not an operator secret. Preview-mode keys in `prerender-manifest.json` are rewritten from the same SHA. `api.github.com` is pointed at `0.0.0.0` only during `next build`. Apt logs and the ldconfig aux-cache are deleted after `wget` is installed. `.next/cache`, `.next/trace`, `.next/trace-build`, and `.next/diagnostics` are omitted.
+
+An earlier pair of builds, before those pins, produced `sha256:07e3d86d164a5afe0548e1cc34a60f01632c20009162a03992b17bb58a01243d` and `sha256:fee2cbf2a4160dffbb469de9b15417bec7bf7e4adab2f5c55e62e4cbbd03329b`. Those digests are not the release image.
