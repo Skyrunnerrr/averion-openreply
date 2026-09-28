@@ -16,4 +16,4 @@ The permitted reproducibility claim is `REPRODUCIBLE_WITH_PINNED_CANONICAL_BUILD
 
 The Server Action key is supplied as BuildKit secret `next_server_actions_key` (base64 of 32 random bytes, release-scoped). The bootstrap and the Dockerfile publish only `SERVER_ACTION_KEY_FINGERPRINT_SHA256`, which is the SHA-256 of those decoded bytes. The retired Model A fingerprint `sha256:099094aeb1df02f2a24222bf38b878b7166c50aa979cfbea09a3e09db680957c` is historical and must not be reused.
 
-OS inputs use Debian snapshot `20260421T000000Z` (`bookworm` main), the same snapshot date as the pinned `node:20-slim` base. `wget` is `1.21.3-1+deb12u1`. The CA bundle is the one already in that base image. The deploy Dockerfile does not install `ca-certificates`.
+OS inputs use Debian snapshot `20260421T000000Z` (`bookworm` main), the same snapshot date as the pinned `node:20-slim` base. `wget` is `1.21.3-1+deb12u1`. That base image has `debian-archive-keyring` and no `/etc/ssl/certs/ca-certificates.crt`. Apt therefore reads the snapshot over HTTP and checks the signed Release file, then installs `ca-certificates=20230311+deb12u1`. It does not run `apt-get upgrade`.

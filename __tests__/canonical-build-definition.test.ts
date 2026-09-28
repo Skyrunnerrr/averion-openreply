@@ -29,7 +29,8 @@ describe("canonical build definition", () => {
     expect(dockerfile).toContain(
       "--mount=type=secret,id=next_server_actions_key",
     );
-    expect(dockerfile).not.toMatch(/apt-get install[^\n]*ca-certificates/);
+    expect(dockerfile).toContain("ca-certificates=20230311+deb12u1");
+    expect(dockerfile).not.toContain("apt-get upgrade");
     expect(dockerfile).toContain("20260421T000000Z");
     expect(dockerfile).toContain("wget=1.21.3-1+deb12u1");
     expect(dockerfile.startsWith("# syntax=docker/dockerfile:1.27.0@sha256:")).toBe(

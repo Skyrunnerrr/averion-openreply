@@ -32,14 +32,16 @@ RUN set -eu; \
     rm -rf /etc/apt/sources.list /etc/apt/sources.list.d; \
     mkdir -p /etc/apt/apt.conf.d /etc/openreply; \
     printf 'Acquire::Check-Valid-Until "false";\n' > /etc/apt/apt.conf.d/99-snapshot; \
-    printf 'deb [check-valid-until=no] https://snapshot.debian.org/archive/debian/%s bookworm main\n' "$DEBIAN_SNAPSHOT" > /etc/apt/sources.list; \
+    printf 'deb [check-valid-until=no] http://snapshot.debian.org/archive/debian/%s bookworm main\n' "$DEBIAN_SNAPSHOT" > /etc/apt/sources.list; \
     apt-get update; \
     test "$WGET_VERSION" = "1.21.3-1+deb12u1"; \
-    apt-get install -y --no-install-recommends wget=1.21.3-1+deb12u1; \
+    apt-get install -y --no-install-recommends \
+      wget=1.21.3-1+deb12u1 \
+      ca-certificates=20230311+deb12u1; \
     test "$(dpkg-query -W -f '${Version}' wget)" = "$WGET_VERSION"; \
     test -s /etc/ssl/certs/ca-certificates.crt; \
     wget -q -O /dev/null --timeout=60 "https://snapshot.debian.org/archive/debian/${DEBIAN_SNAPSHOT}/dists/bookworm/Release"; \
-    printf '%s\n' "base-image:docker.io/library/node@sha256:3d0f05455dea2c82e2f76e7e2543964c30f6b7d673fc1a83286736d44fe4c41c" > /etc/openreply/ca-cert-source; \
+    printf '%s\n' "snapshot:20260421T000000Z ca-certificates=20230311+deb12u1" > /etc/openreply/ca-cert-source; \
     printf '%s\n' "$DEBIAN_SNAPSHOT" > /etc/openreply/apt-snapshot; \
     dpkg-query -W -f '${Version}\n' wget > /etc/openreply/wget-version; \
     rm -rf /var/lib/apt/lists/* /var/log/apt /var/log/dpkg.log /var/cache/apt /var/cache/ldconfig /tmp/*
