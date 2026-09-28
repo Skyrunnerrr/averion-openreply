@@ -19,7 +19,7 @@
   "CA_BUNDLE_PROVEN": "YES",
   "PROVENANCE_SCHEMA": "PASS",
   "BUILD_DEFINITION_SHA": "6bfff79d4cf4e739bb0795f98a3ab29fbfb2d859",
-  "DEPLOYMENT_BUNDLE_SHA": null,
+  "DEPLOYMENT_BUNDLE_SHA": "4182d05fed700f2a6d24470d026fd1b4ec95199a",
   "NEXT_CURRENT_INSTALLED": "16.2.6",
   "NEXT_FINAL_TARGET": "HOLD. RC2.2B re-checks the official baseline on or after 2026-09-30. Published interim reference is 16.3.6. Expect 16.3.7 if that is the release published that day. Do not install 16.3.7 before it is published.",
   "NEXT_REGRESSION_MATRIX": "READY",

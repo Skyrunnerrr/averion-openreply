@@ -66,6 +66,12 @@ describe("canonical build definition", () => {
     expect(provenance.authorities.APP_RUNTIME_SOURCE_SHA).toBe(
       "ea2b1c6e0a88eaeb0fa3daefaf0b0f869bb7566c",
     );
+    expect(provenance.authorities.BUILD_DEFINITION_SHA).toBe(
+      "6bfff79d4cf4e739bb0795f98a3ab29fbfb2d859",
+    );
+    expect(provenance.authorities.DEPLOYMENT_BUNDLE_SHA).toBe(
+      "4182d05fed700f2a6d24470d026fd1b4ec95199a",
+    );
     expect(provenance.authorities).not.toHaveProperty("SOURCE_SHA");
     expect(provenance.authorities).not.toHaveProperty("RELEASE_CANDIDATE_SHA");
   });

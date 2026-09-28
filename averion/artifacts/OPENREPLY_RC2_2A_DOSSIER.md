@@ -18,7 +18,7 @@ RC2.2A is the runtime and build-definition remediation. It does not freeze a rel
 | APT_INPUT_PINNED | `YES` |
 | PROVENANCE_SCHEMA | `PASS` |
 | BUILD_DEFINITION_SHA | `6bfff79d4cf4e739bb0795f98a3ab29fbfb2d859` |
-| DEPLOYMENT_BUNDLE_SHA | recorded by the commit that follows this dossier |
+| DEPLOYMENT_BUNDLE_SHA | `4182d05fed700f2a6d24470d026fd1b4ec95199a` (the dossier commit; the commit that records this id is only a stamp) |
 | NEXT_CURRENT_INSTALLED | `16.2.6` |
 | NEXT_FINAL_TARGET | `HOLD` |
 | NEXT_REGRESSION_MATRIX | `READY` |
@@ -51,6 +51,6 @@ Five authorities, not collapsed into `SOURCE_SHA`:
 | HARDENING_BASE_SHA | `727d364cbc7ac6fb9ce1825c3c43599a0e1a7b10` |
 | APP_RUNTIME_SOURCE_SHA | `ea2b1c6e0a88eaeb0fa3daefaf0b0f869bb7566c` |
 | BUILD_DEFINITION_SHA | `6bfff79d4cf4e739bb0795f98a3ab29fbfb2d859` |
-| DEPLOYMENT_BUNDLE_SHA | recorded by the commit that follows this dossier |
+| DEPLOYMENT_BUNDLE_SHA | `4182d05fed700f2a6d24470d026fd1b4ec95199a` (the dossier commit; the commit that records this id is only a stamp) |
 
 RC2.2B remains the hold sequence in `averion/artifacts/OPENREPLY_RC2_2B_RUNBOOK.md`.
