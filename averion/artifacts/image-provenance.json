@@ -1,0 +1,41 @@
+{
+  "sourceSha": "727d364cbc7ac6fb9ce1825c3c43599a0e1a7b10",
+  "parentSha": "075020817b18cf65b548d474e0ce86b8b7b7dbb8",
+  "parentDiff": "empty",
+  "upstreamPin": "5760181c4bb9683241357cbbcd8ca635d19f835a",
+  "lockfileSha256": "df7f69b394d4fd22a076448b86a6ef0a489d240259661fd07105e76ade389416",
+  "lockfileCheck": "package-lock.json: OK",
+  "buildContext": "git archive of sourceSha",
+  "dockerfile": "averion/deploy/Dockerfile",
+  "baseImage": "docker.io/library/node@sha256:3d0f05455dea2c82e2f76e7e2543964c30f6b7d673fc1a83286736d44fe4c41c",
+  "sourceDateEpoch": 1790583091,
+  "imageCreated": "2026-09-28T08:11:31Z",
+  "buildWallClock": {
+    "start": "2026-09-28T08:20:51Z",
+    "end": "2026-09-28T08:21:54Z"
+  },
+  "imageDigest": "sha256:07e3d86d164a5afe0548e1cc34a60f01632c20009162a03992b17bb58a01243d",
+  "imageDigestKind": "oci-manifest",
+  "configDigest": "sha256:908ac1b39fdd9ee58e453029a4ec169ab66ec0a20dd174474e14c138bb7ae175",
+  "podmanStorageDigest": "sha256:f597d5f092353acbe48c8444afa3af0f8e8e9ae532b2ecb72af2f628d2e0ad82",
+  "registryPush": false,
+  "rebuild": {
+    "noCache": true,
+    "sameSourceDateEpoch": true,
+    "ociManifestDigest": "sha256:fee2cbf2a4160dffbb469de9b15417bec7bf7e4adab2f5c55e62e4cbbd03329b",
+    "matchesFirstDigest": false,
+    "nodeModulesLayerMatched": true,
+    "differingLayers": [
+      "apt logs and ldconfig aux-cache (var/log/apt/history.log, var/log/apt/term.log, var/log/dpkg.log, var/cache/ldconfig/aux-cache)",
+      ".next build id and chunk hashes"
+    ]
+  },
+  "sbom": {
+    "path": "averion/artifacts/sbom.cdx.json",
+    "format": "CycloneDX",
+    "specVersion": "1.5",
+    "components": 568,
+    "sha256": "d93a43badf97ad17af4d32bfe19732033d49c08721bf816033ad9e28d625f412"
+  },
+  "licenseManifest": "averion/artifacts/license-manifest.json"
+}

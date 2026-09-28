@@ -1,0 +1,97 @@
+name: openreply-averion-p2b
+# Deployment topology for the frozen OpenReply release candidate.
+# No host ports are published. Postgres, Redis, the web process, the worker,
+# and cron share the internal network only. The public edge is
+# averion/deploy/ingress-edge.mjs enforcing averion/deploy/ingress-policy.json.
+# This file does not start that edge and does not deploy to production.
+
+services:
+  postgres:
+    image: docker.io/library/postgres@sha256:a85daf0dbd5e79586e850e3fe4b21b796799828ad015ce2166aeb98cc24da61c
+    environment:
+      POSTGRES_DB: openreply
+      POSTGRES_USER: openreply
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+    secrets:
+      - postgres_password
+    networks: [internal]
+    restart: unless-stopped
+
+  redis:
+    image: docker.io/library/redis@sha256:ca0acbb137c1dc3339c8b147a58fd6f42775d4599327b50e7b116c23de501af2
+    command:
+      - sh
+      - -c
+      - redis-server --appendonly yes --requirepass "$$(cat /run/secrets/redis_password)"
+    secrets:
+      - redis_password
+    networks: [internal]
+    restart: unless-stopped
+
+  web:
+    image: ${OPENREPLY_IMAGE_REF:?set to the digest produced from the release candidate}
+    env_file:
+      - path: ./secrets.env
+        required: false
+    environment:
+      NODE_ENV: production
+      OPENREPLY_PROVIDER_PROFILE: averion
+      OPENREPLY_AUTOMATIONS_ENABLED: "false"
+      OPENREPLY_HUMAN_SEND_ENABLED: "false"
+    command:
+      - sh
+      - -c
+      - node /config/check-readiness.mjs && npx prisma migrate deploy && npm run start
+    volumes:
+      - ./check-readiness.mjs:/config/check-readiness.mjs:ro
+      - ./ingress-edge.mjs:/config/ingress-edge.mjs:ro
+      - ./ingress-policy.json:/config/ingress-policy.json:ro
+    networks: [internal]
+    restart: unless-stopped
+    expose: ["3000"]
+
+  worker:
+    image: ${OPENREPLY_IMAGE_REF:?set to the digest produced from the release candidate}
+    env_file:
+      - path: ./secrets.env
+        required: false
+    environment:
+      NODE_ENV: production
+      OPENREPLY_PROVIDER_PROFILE: averion
+      OPENREPLY_AUTOMATIONS_ENABLED: "false"
+      OPENREPLY_HUMAN_SEND_ENABLED: "false"
+    command: ["sh", "-c", "node /config/check-readiness.mjs && npm run worker"]
+    volumes:
+      - ./check-readiness.mjs:/config/check-readiness.mjs:ro
+      - ./ingress-edge.mjs:/config/ingress-edge.mjs:ro
+      - ./ingress-policy.json:/config/ingress-policy.json:ro
+    networks: [internal]
+    restart: unless-stopped
+
+  cron:
+    image: ${OPENREPLY_IMAGE_REF:?set to the digest produced from the release candidate}
+    environment:
+      CRON_BASE_URL: http://web:3000
+    env_file:
+      - path: ./secrets.env
+        required: false
+    command: ["sh", "-c", "node /config/check-readiness.mjs && exec sh scripts/cron.sh"]
+    volumes:
+      - ./check-readiness.mjs:/config/check-readiness.mjs:ro
+      - ./ingress-edge.mjs:/config/ingress-edge.mjs:ro
+      - ./ingress-policy.json:/config/ingress-policy.json:ro
+    networks: [internal]
+    restart: unless-stopped
+
+networks:
+  internal:
+    # Bridge with no published ports. Not docker "internal: true": that mode
+    # also blocks outbound calls to Meta and the mail provider, which the
+    # webhook and sign-in paths require. Host firewall must not publish
+    # 3000, 5432, or 6379.
+
+secrets:
+  postgres_password:
+    file: ./secrets/postgres_password
+  redis_password:
+    file: ./secrets/redis_password

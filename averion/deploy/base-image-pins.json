@@ -1,0 +1,34 @@
+{
+  "resolvedAt": "2026-09-28T08:18:00Z",
+  "registry": "https://registry-1.docker.io",
+  "note": "Tag lookups are mutable. Deployment files reference the linux/amd64 manifest digest captured below. Each digest was fetched again by digest and the Docker-Content-Digest header matched.",
+  "images": [
+    {
+      "role": "app-base",
+      "repository": "library/node",
+      "tagObserved": "20-slim",
+      "indexDigest": "sha256:2cf067cfed83d5ea958367df9f966191a942351a2df77d6f0193e162b5febfc0",
+      "platform": "linux/amd64",
+      "manifestDigest": "sha256:3d0f05455dea2c82e2f76e7e2543964c30f6b7d673fc1a83286736d44fe4c41c",
+      "usedBy": "averion/deploy/Dockerfile"
+    },
+    {
+      "role": "postgres",
+      "repository": "library/postgres",
+      "tagObserved": "16",
+      "indexDigest": "sha256:1a6ab3f5345eb6dbe04a1349529caabdb0ab09293a09590fad07b2246bfa4b54",
+      "platform": "linux/amd64",
+      "manifestDigest": "sha256:a85daf0dbd5e79586e850e3fe4b21b796799828ad015ce2166aeb98cc24da61c",
+      "usedBy": "averion/deploy/compose.provider.yml"
+    },
+    {
+      "role": "redis",
+      "repository": "library/redis",
+      "tagObserved": "7-alpine",
+      "indexDigest": "sha256:858f009f9709ce576febc734aa78b8f6d624b82571f9ddb6bda4377c833b3499",
+      "platform": "linux/amd64",
+      "manifestDigest": "sha256:ca0acbb137c1dc3339c8b147a58fd6f42775d4599327b50e7b116c23de501af2",
+      "usedBy": "averion/deploy/compose.provider.yml"
+    }
+  ]
+}
