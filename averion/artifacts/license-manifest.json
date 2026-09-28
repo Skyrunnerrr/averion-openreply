@@ -5,8 +5,10 @@
     "license": "MIT",
     "licenseFile": "LICENSE"
   },
-  "sourceSha": "727d364cbc7ac6fb9ce1825c3c43599a0e1a7b10",
+  "componentSourceSha": "ea2b1c6e0a88eaeb0fa3daefaf0b0f869bb7566c",
+  "hardeningBaseSha": "727d364cbc7ac6fb9ce1825c3c43599a0e1a7b10",
   "lockfileSha256": "df7f69b394d4fd22a076448b86a6ef0a489d240259661fd07105e76ade389416",
+  "generatedFromLockfile": true,
   "sbom": "averion/artifacts/sbom.cdx.json",
   "componentCount": 568,
   "unknownLicenseCount": 1,
@@ -3439,6 +3441,7 @@
     }
   ],
   "notes": [
-    "seq-queue@0.0.5 has no license field in package.json. Counted as UNKNOWN. It was not assigned a license."
+    "seq-queue@0.0.5 has no license field in package.json. Counted as UNKNOWN. It was not assigned a license.",
+    "componentSourceSha is the app image source ea2b1c6e0a88eaeb0fa3daefaf0b0f869bb7566c. The lockfile bytes match lockfileSha256. seq-queue@0.0.5 stays UNKNOWN."
   ]
 }

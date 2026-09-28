@@ -1,4 +1,14 @@
 {
+  "authorities": {
+    "upstreamPin": "5760181c4bb9683241357cbbcd8ca635d19f835a",
+    "hardeningBaseSha": "727d364cbc7ac6fb9ce1825c3c43599a0e1a7b10",
+    "appImageSourceSha": "ea2b1c6e0a88eaeb0fa3daefaf0b0f869bb7566c",
+    "deploymentBundleSha": null,
+    "deploymentBundleNote": "The RC2 git commit is bound by the controller dossier. This file does not embed that commit id, and it is not appImageSourceSha."
+  },
+  "appImageSourceSha": "ea2b1c6e0a88eaeb0fa3daefaf0b0f869bb7566c",
+  "deploymentBundleSha": null,
+  "sourceShaRole": "appImageSourceSha. The image archive. Not the deployment bundle.",
   "appImageUnchanged": false,
   "appImageUnchangedReason": "lib/automation/attach-next-reel.ts returns before any Instagram client call when OPENREPLY_AUTOMATIONS_ENABLED=false. That file is in the runner image at /app/lib/automation/attach-next-reel.ts. This imageDigest was built from sourceSha.",
   "imageMatchesSourceSha": true,
@@ -32,7 +42,10 @@
   "runtimeProof": {
     "buildIdInsideImage": "ea2b1c6e0a88eaeb0fa3daefaf0b0f869bb7566c",
     "attachPendingNextReelsPath": "/app/lib/automation/attach-next-reel.ts",
-    "areAutomationsEnabledLines": [2, 33]
+    "areAutomationsEnabledLines": [
+      2,
+      33
+    ]
   },
   "buildWallClock": {
     "firstStart": "2026-09-28T12:58:05Z",

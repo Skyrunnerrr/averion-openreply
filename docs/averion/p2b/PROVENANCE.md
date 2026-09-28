@@ -1,6 +1,17 @@
 # Image provenance
 
-`OPENREPLY_IMAGE_REPRODUCIBLE=YES` for source `ea2b1c6e0a88eaeb0fa3daefaf0b0f869bb7566c`.
+Three SHA authorities stay distinct.
+
+| Authority | SHA | Role |
+| --- | --- | --- |
+| upstreamPin | `5760181c4bb9683241357cbbcd8ca635d19f835a` | Upstream OpenReply pin |
+| hardeningBaseSha | `727d364cbc7ac6fb9ce1825c3c43599a0e1a7b10` | Hardening base. Historical image only. |
+| appImageSourceSha | `ea2b1c6e0a88eaeb0fa3daefaf0b0f869bb7566c` | Git archive inside the runner image |
+| deploymentBundleSha | Bound by the RC2 git commit in the controller dossier | Docs and evidence after the image source. Not equal to appImageSourceSha. |
+
+`OPENREPLY_IMAGE_REPRODUCIBLE=YES` for app image source `ea2b1c6e0a88eaeb0fa3daefaf0b0f869bb7566c`.
+
+`APP_IMAGE_REBUILD_REQUIRED=NO` for an RC2 commit that only changes provenance docs, ingress/egress metadata, and evidence artifacts. The runner image is a `git archive` of `appImageSourceSha`, plus `pin-next-build.mjs` and `normalize-next-output.mjs` from the deploy build context at that same commit. Those two scripts are not part of the RC2 edit set. `ingress-policy.json` and `egress-map.json` are mounted at runtime. They are not copied into the runner stage. The recorded OCI manifest stays `sha256:8f44fe4f707ff86993d93ad222bafdaf3a314fbf704e33cfd64a433042f24b23`.
 
 `APP_IMAGE_UNCHANGED=NO` relative to the previous image of `727d364cbc7ac6fb9ce1825c3c43599a0e1a7b10`. `lib/automation/attach-next-reel.ts` returns before any Instagram client call when automations are disabled. The runner image contains that file at `/app/lib/automation/attach-next-reel.ts` (guard on lines 2 and 33). `.next/BUILD_ID` and `org.opencontainers.image.revision` are the source SHA below.
 

@@ -1,6 +1,13 @@
 # P2B deployment topology
 
-Release candidate for the route audit remains `727d364cbc7ac6fb9ce1825c3c43599a0e1a7b10` on `averion/p2b-hardening`. Upstream pin `5760181c4bb9683241357cbbcd8ca635d19f835a`.
+Three SHA authorities stay distinct. The hardening base is not the current deployment bundle, and the app image source is not the deployment bundle.
+
+| Authority | SHA |
+| --- | --- |
+| upstreamPin | `5760181c4bb9683241357cbbcd8ca635d19f835a` |
+| hardeningBaseSha | `727d364cbc7ac6fb9ce1825c3c43599a0e1a7b10` |
+| appImageSourceSha | `ea2b1c6e0a88eaeb0fa3daefaf0b0f869bb7566c` |
+| deploymentBundleSha | Bound by the RC2 git commit in the controller dossier. This file does not embed that commit id. |
 
 ```text
 public internet

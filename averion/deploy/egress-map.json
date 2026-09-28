@@ -1,8 +1,12 @@
 {
   "schema": "averion.openreply.egress.v1",
-  "releaseCandidateSha": "727d364cbc7ac6fb9ce1825c3c43599a0e1a7b10",
-  "enforcement": "NOT_IMPLEMENTED",
-  "enforcementNote": "EGRESS_INVENTORY is this file. EGRESS_ENFORCEMENT is NOT_IMPLEMENTED. Docker Compose bridge networks do not filter outbound traffic by destination hostname. See docs/averion/p2b/EGRESS_ADR.md. Choice B defers that control to a staging infrastructure gate.",
+  "upstreamPin": "5760181c4bb9683241357cbbcd8ca635d19f835a",
+  "hardeningBaseSha": "727d364cbc7ac6fb9ce1825c3c43599a0e1a7b10",
+  "appImageSourceSha": "ea2b1c6e0a88eaeb0fa3daefaf0b0f869bb7566c",
+  "deploymentBundleSha": null,
+  "deploymentBundleNote": "The RC2 git commit is bound by the controller dossier. This file does not embed that commit id, and it is not appImageSourceSha.",
+  "enforcement": "DEFERRED_TO_STAGING_INFRA",
+  "enforcementNote": "EGRESS_INVENTORY is this file. EGRESS_ENFORCEMENT is DEFERRED_TO_STAGING_INFRA (ADR B). Docker Compose bridge networks do not filter outbound traffic by destination hostname. This map does not add that filter.",
   "destinations": [
     {
       "host": "graph.instagram.com",
