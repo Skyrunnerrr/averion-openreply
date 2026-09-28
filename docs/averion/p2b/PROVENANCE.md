@@ -1,15 +1,16 @@
 # Image provenance
 
-Three SHA authorities stay distinct.
+Five SHA authorities stay distinct. Names and values are in `averion/deploy/provenance-schema.json`. Do not collapse them into `SOURCE_SHA` or `RELEASE_CANDIDATE_SHA`.
 
 | Authority | SHA | Role |
 | --- | --- | --- |
-| upstreamPin | `5760181c4bb9683241357cbbcd8ca635d19f835a` | Upstream OpenReply pin |
-| hardeningBaseSha | `727d364cbc7ac6fb9ce1825c3c43599a0e1a7b10` | Hardening base. Historical image only. |
-| appImageSourceSha | `ea2b1c6e0a88eaeb0fa3daefaf0b0f869bb7566c` | Git archive inside the runner image |
-| deploymentBundleSha | Bound by the RC2 git commit in the controller dossier | Docs and evidence after the image source. Not equal to appImageSourceSha. |
+| UPSTREAM_PIN | `5760181c4bb9683241357cbbcd8ca635d19f835a` | Upstream OpenReply pin. Verified on this branch as `main`. |
+| HARDENING_BASE_SHA | `727d364cbc7ac6fb9ce1825c3c43599a0e1a7b10` | Hardening base. Historical image only. |
+| APP_RUNTIME_SOURCE_SHA | `ea2b1c6e0a88eaeb0fa3daefaf0b0f869bb7566c` | Historical git archive inside the recorded runner image. A later Next bump creates a new one. |
+| BUILD_DEFINITION_SHA | Assigned when the RC2.2A canonical builder commit lands | Builder definition. Not the app runtime source. |
+| DEPLOYMENT_BUNDLE_SHA | Assigned when the RC2.2A dossier commit lands | Docs and evidence. Not the app runtime source. |
 
-`OPENREPLY_IMAGE_REPRODUCIBLE=YES` for app image source `ea2b1c6e0a88eaeb0fa3daefaf0b0f869bb7566c`.
+`OPENREPLY_IMAGE_REPRODUCIBLE=YES` was recorded for app image source `ea2b1c6e0a88eaeb0fa3daefaf0b0f869bb7566c` under the previous builder. That claim is historical. The permitted claim for the RC2.2A builder is `REPRODUCIBLE_WITH_PINNED_CANONICAL_BUILDER`. It is not `BIT_REPRODUCIBLE_ACROSS_ARBITRARY_BUILDERS`. Digests from that earlier pair are not canonical.
 
 `APP_IMAGE_REBUILD_REQUIRED=NO` for an RC2 commit that only changes provenance docs, ingress/egress metadata, and evidence artifacts. The runner image is a `git archive` of `appImageSourceSha`, plus `pin-next-build.mjs` and `normalize-next-output.mjs` from the deploy build context at that same commit. Those two scripts are not part of the RC2 edit set. `ingress-policy.json` and `egress-map.json` are mounted at runtime. They are not copied into the runner stage. The recorded OCI manifest stays `sha256:8f44fe4f707ff86993d93ad222bafdaf3a314fbf704e33cfd64a433042f24b23`.
 
@@ -50,6 +51,6 @@ The runner image does not contain `docs/` or `averion/deploy/prove-public-edge.m
 
 The previous image of `727d364cbc7ac6fb9ce1825c3c43599a0e1a7b10` is OCI manifest `sha256:4ba1cb451075e593880ca1f760c913134537a64e26ad0e2bd5c28d1929ffe677` (config `sha256:6703eab9533313c827f22ff7f6d6df84df6599f8884b82ffb50906e2a14d737a`). That digest is historical.
 
-The image build pins `generateBuildId` to SOURCE_SHA, sets `NEXT_TELEMETRY_DISABLED=1`, and sets `experimental.cpus` to 1. `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` stays the committed literal `bBlyVERylKvU8K2Pp8RHTM4GfW6Celhb5B8uyLaeRuA=`. That literal equals `base64(sha256("averion-openreply-p2b-" + 727d364cbc7ac6fb9ce1825c3c43599a0e1a7b10))`. Both builds of this source SHA used that literal. It is a public determinism constant, not an operator secret. Preview-mode keys in `prerender-manifest.json` are rewritten from SOURCE_SHA. `api.github.com` is pointed at `0.0.0.0` only during `next build`. Apt logs and the ldconfig aux-cache are deleted after `wget` is installed. `.next/cache`, `.next/trace`, `.next/trace-build`, and `.next/diagnostics` are omitted.
+The recorded historical image pinned `generateBuildId` to the app runtime source SHA, set `NEXT_TELEMETRY_DISABLED=1`, and set `experimental.cpus` to 1. That image used Server Action key Model A, a committed public value derived from `HARDENING_BASE_SHA`. Model A is retired. Its fingerprint, SHA-256 of the decoded 32-byte key, is `sha256:099094aeb1df02f2a24222bf38b878b7166c50aa979cfbea09a3e09db680957c`. Do not reuse it. RC2.2A replaces it with Model B: a release-scoped random key supplied only as BuildKit secret `next_server_actions_key`. Preview-mode keys in `prerender-manifest.json` were rewritten from the source SHA. `api.github.com` was pointed at `0.0.0.0` only during `next build`. Those historical digests are not canonical.
 
 An earlier pair of builds, before those pins, produced `sha256:07e3d86d164a5afe0548e1cc34a60f01632c20009162a03992b17bb58a01243d` and `sha256:fee2cbf2a4160dffbb469de9b15417bec7bf7e4adab2f5c55e62e4cbbd03329b`. Those digests are not the release image.

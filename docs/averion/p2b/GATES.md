@@ -11,6 +11,8 @@ SHA authorities:
 | appImageSourceSha | `ea2b1c6e0a88eaeb0fa3daefaf0b0f869bb7566c` |
 | deploymentBundleSha | Bound by the RC2 git commit in the controller dossier. This file does not embed that commit id. |
 
+RC2.2A publishes exactly five authorities in `averion/deploy/provenance-schema.json`: `UPSTREAM_PIN`, `HARDENING_BASE_SHA`, `APP_RUNTIME_SOURCE_SHA`, `BUILD_DEFINITION_SHA`, `DEPLOYMENT_BUNDLE_SHA`. This gate table remains the historical RC2 record. `MERGE=NO`.
+
 `READY_FOR_HUMAN_MERGE_AUTH=NO`. Native GitHub Actions on the deployment bundle is a separate gate. A clean-room run of the same commands is not that gate.
 
 `READY_FOR_META_HUMAN_CLOSURE=NO`

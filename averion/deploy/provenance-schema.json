@@ -1,0 +1,18 @@
+{
+  "schema": "averion.openreply.provenance.v2",
+  "authorities": {
+    "UPSTREAM_PIN": "5760181c4bb9683241357cbbcd8ca635d19f835a",
+    "HARDENING_BASE_SHA": "727d364cbc7ac6fb9ce1825c3c43599a0e1a7b10",
+    "APP_RUNTIME_SOURCE_SHA": "ea2b1c6e0a88eaeb0fa3daefaf0b0f869bb7566c",
+    "BUILD_DEFINITION_SHA": null,
+    "DEPLOYMENT_BUNDLE_SHA": null
+  },
+  "rules": [
+    "Exactly these five authorities are published.",
+    "Do not collapse them into SOURCE_SHA or RELEASE_CANDIDATE_SHA.",
+    "APP_RUNTIME_SOURCE_SHA stays the historical runner source until RC2.2B creates a new one.",
+    "BUILD_DEFINITION_SHA is the commit that introduces the canonical builder files.",
+    "DEPLOYMENT_BUNDLE_SHA is the commit that introduces the RC2.2A dossier.",
+    "A commit cannot store its own id. The dossier records the resolved ids after those commits exist."
+  ]
+}

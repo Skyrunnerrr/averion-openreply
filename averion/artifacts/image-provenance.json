@@ -32,8 +32,8 @@
   "determinism": {
     "generateBuildId": "SOURCE_SHA",
     "nextTelemetryDisabled": "1",
-    "serverActionsEncryptionKey": "committed literal bBlyVERylKvU8K2Pp8RHTM4GfW6Celhb5B8uyLaeRuA=",
-    "serverActionsEncryptionKeyNote": "The Dockerfile comment describes base64(sha256(\"averion-openreply-p2b-\" + SOURCE_SHA)). The ENV literal equals that formula for 727d364cbc7ac6fb9ce1825c3c43599a0e1a7b10. Both builds of sourceSha used the committed literal. The formula was not recomputed for sourceSha.",
+    "serverActionsEncryptionKey": "MODEL_A_RETIRED",
+    "serverActionsEncryptionKeyNote": "Historical Model A fingerprint sha256:099094aeb1df02f2a24222bf38b878b7166c50aa979cfbea09a3e09db680957c, derived from HARDENING_BASE_SHA. The raw key is not recorded. RC2.2A uses Model B.",
     "previewKeys": "sha256(SOURCE_SHA + label) truncated in averion/deploy/normalize-next-output.mjs",
     "githubStars": "api.github.com forced to 0.0.0.0 during next build",
     "aptLogsRemoved": true,
