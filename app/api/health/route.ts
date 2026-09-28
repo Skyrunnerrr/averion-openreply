@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db/client";
 import { getDMQueue, getRedisConnection } from "@/lib/queue/client";
 import { getWorkerHealth } from "@/lib/ops/worker-health";
+import { signupPolicyFailureReason } from "@/lib/provider-controls";
 
 export const runtime = "nodejs";
 // Health must reflect live state (worker heartbeat, queue depth), never a
@@ -69,11 +70,17 @@ export async function GET() {
     })),
   ]);
 
+  const signupFailure = signupPolicyFailureReason();
+  const signupPolicy: HealthCheck = signupFailure
+    ? { status: "error", detail: signupFailure }
+    : { status: "ok" };
+
   const healthy =
     database.status === "ok" &&
     redis.status === "ok" &&
     queue.status === "ok" &&
-    worker.healthy;
+    worker.healthy &&
+    signupPolicy.status === "ok";
 
   return NextResponse.json(
     {
@@ -83,6 +90,7 @@ export async function GET() {
         redis,
         queue,
         worker,
+        signupPolicy,
       },
     },
     { status: healthy ? 200 : 503 }

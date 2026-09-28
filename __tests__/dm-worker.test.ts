@@ -217,6 +217,7 @@ function createMockPostbackJob(
 }
 
 beforeEach(() => {
+  vi.stubEnv("OPENREPLY_AUTOMATIONS_ENABLED", "true");
   vi.clearAllMocks();
   mockPrisma.postbackDelivery.create.mockReset().mockResolvedValue({});
   mockPrisma.postbackDelivery.delete.mockReset().mockResolvedValue({});
@@ -317,6 +318,21 @@ describe("DM Worker — comments left on an ad", () => {
 });
 
 describe("DM Worker — Full Pipeline", () => {
+  it("does not send when automations are disabled", async () => {
+    vi.stubEnv("OPENREPLY_AUTOMATIONS_ENABLED", "false");
+    const processor = getProcessor();
+
+    await processor(createMockJob());
+
+    expect(mockSendPrivateReply).not.toHaveBeenCalled();
+    expect(mockSendPrivateReplyWithButton).not.toHaveBeenCalled();
+    expect(mockSendPrivateReplyWithLinkButton).not.toHaveBeenCalled();
+    expect(mockSendDirectMessage).not.toHaveBeenCalled();
+    expect(mockSendDirectMessageWithButton).not.toHaveBeenCalled();
+    expect(mockSendDirectMessageWithLinkButton).not.toHaveBeenCalled();
+    expect(mockQueueAdd).not.toHaveBeenCalled();
+  });
+
   it("should send a private reply for a matching comment", async () => {
     const processor = getProcessor();
 

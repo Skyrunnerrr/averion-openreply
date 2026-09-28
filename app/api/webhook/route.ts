@@ -40,7 +40,8 @@ export async function POST(request: NextRequest) {
           payload: {
             hadSignatureHeader: Boolean(signature),
             bodyLength: rawBody.length,
-            bodyPreview: rawBody.slice(0, 200),
+            failureClass: "invalid_signature",
+            timestamp: new Date().toISOString(),
           },
         },
       })

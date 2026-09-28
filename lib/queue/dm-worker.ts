@@ -44,6 +44,7 @@ import {
   renderMessageWithoutLink,
 } from "@/lib/tracking/message";
 import { TRACKED_LINK_ORDER } from "@/lib/tracking/link-order";
+import { areAutomationsEnabled } from "@/lib/provider-controls";
 
 import {
   ZernioApiError,
@@ -1382,6 +1383,13 @@ async function dispatchJob(job: Job<DmQueueJob>): Promise<void> {
 }
 
 async function processJob(job: Job<DmQueueJob>): Promise<void> {
+  if (!areAutomationsEnabled()) {
+    console.log(
+      `[DM Worker] Skipping job ${job.id ?? "unknown"} because automations are disabled`
+    );
+    return;
+  }
+
   try {
     await dispatchJob(job);
   } catch (error) {

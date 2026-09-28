@@ -14,6 +14,7 @@ import {
   getFollowerHistory,
   type FollowerHistoryPoint,
 } from "@/lib/reports/follower-history";
+import { insightsPermissionRequested } from "@/lib/provider-controls";
 
 // Allow time for paginated media + per-post insight calls on larger accounts.
 export const maxDuration = 60;
@@ -69,6 +70,12 @@ export interface OverviewResponse {
   requestedCount: "all" | number;
   truncated: boolean;
   insightsAvailable: boolean;
+  /**
+   * False when this deployment's OAuth scope set does not include insights.
+   * The reconnect banner must not ask for a permission the authorize URL
+   * will not request.
+   */
+  insightsScopeRequested: boolean;
   /** Current follower total, or null if Instagram did not return it. */
   followers: number | null;
   /**
@@ -145,31 +152,36 @@ export async function GET(request: NextRequest) {
     // Likes and comments come free with basic media fields. Views / reach /
     // saved / shares require the insights permission, so fetch them per media
     // (bounded concurrency) and degrade gracefully if the token was granted
-    // before that scope.
+    // before that scope. The AVERION scope set does not request insights, so
+    // those calls are skipped entirely.
+    const insightsScopeRequested =
+      account.provider !== "META" || insightsPermissionRequested();
     let insightsAvailable = false;
     let permissionDenied = false;
 
-    const insights = await mapWithConcurrency(
-      media,
-      INSIGHTS_CONCURRENCY,
-      async (m) => {
-        const metrics = isVideoLike(m)
-          ? ["views", "reach", "saved", "shares", "total_interactions"]
-          : ["reach", "saved", "shares", "total_interactions"];
-        try {
-          const data = await getMediaInsights({
-            context: accessToken,
-            mediaId: m.id,
-            metrics: metrics,
-          });
-          insightsAvailable = true;
-          return data;
-        } catch (err) {
-          if (err instanceof PermissionError) permissionDenied = true;
-          return null;
-        }
-      }
-    );
+    const insights = insightsScopeRequested
+      ? await mapWithConcurrency(
+          media,
+          INSIGHTS_CONCURRENCY,
+          async (m) => {
+            const metrics = isVideoLike(m)
+              ? ["views", "reach", "saved", "shares", "total_interactions"]
+              : ["reach", "saved", "shares", "total_interactions"];
+            try {
+              const data = await getMediaInsights({
+                context: accessToken,
+                mediaId: m.id,
+                metrics: metrics,
+              });
+              insightsAvailable = true;
+              return data;
+            } catch (err) {
+              if (err instanceof PermissionError) permissionDenied = true;
+              return null;
+            }
+          }
+        )
+      : media.map(() => null);
 
     const posts: OverviewPost[] = media.map((m, i) => {
       const ins = insights[i];
@@ -251,9 +263,14 @@ export async function GET(request: NextRequest) {
               "Post reporting covers the 25 most recent Instagram posts.",
               "Insights and follower history require the Zernio Analytics add-on and reflect its last sync. Missing metrics remain unavailable.",
             ]
-          : [],
+          : insightsScopeRequested
+            ? []
+            : [
+                "Views, reach, saved, and shares are disabled. This deployment does not request instagram_business_manage_insights.",
+              ],
       truncated,
       insightsAvailable: insightsAvailable && !permissionDenied,
+      insightsScopeRequested,
       followers,
       followerHistory,
       totals,

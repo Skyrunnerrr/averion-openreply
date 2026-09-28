@@ -2,6 +2,7 @@ import { prisma } from '@/lib/db/client';
 import { getDMQueue, MESSAGE_JOB_NAME, POSTBACK_JOB_NAME } from '@/lib/queue/client';
 import { parseCommentEvents, parseMessageEvents, parsePostbackEvents, parseReadEvents } from '@/lib/meta/webhook';
 import { Prisma, type InstagramProvider } from '@/app/generated/prisma/client';
+import { areAutomationsEnabled } from '@/lib/provider-controls';
 
 const OPENING_DM_READ_FALLBACK_DELAY_MS = 5 * 60 * 1000;
 type InstagramPayload = Parameters<typeof parseCommentEvents>[0];
@@ -31,6 +32,20 @@ export async function processInstagramWebhook({ payload: incoming, provider, wor
   });
 
   try {
+    // Ingest already stored the event. The kill switch stops every automation
+    // job (comment, DM keyword, postback, read fallback) before queueing.
+    // The worker process is left running.
+    if (!areAutomationsEnabled()) {
+      await prisma.webhookEvent.update({
+        where: { id: webhookEvent.id },
+        data: {
+          status: "PROCESSED",
+          processedAt: new Date(),
+        },
+      });
+      return;
+    }
+
     const commentEvents = parseCommentEvents(
       payload as Parameters<typeof parseCommentEvents>[0]
     );
