@@ -39,6 +39,18 @@ fi
 SECRET_FILE="$(mktemp)"
 LOG_FILE="$(mktemp)"
 cleanup() {
+  local code=$?
+  if [ "$code" -ne 0 ] && [ -f "$LOG_FILE" ]; then
+    python3 - "$SECRET_FILE" "$LOG_FILE" /tmp/synthetic-build.log <<'PY'
+import pathlib, sys
+secret = pathlib.Path(sys.argv[1]).read_text(errors="replace") if pathlib.Path(sys.argv[1]).exists() else ""
+text = pathlib.Path(sys.argv[2]).read_text(errors="replace")
+if secret.strip():
+    text = text.replace(secret.strip(), "[REDACTED]")
+pathlib.Path(sys.argv[3]).write_text(text[-12000:])
+PY
+    echo "PROOF_FAILED=${code} redacted_log=/tmp/synthetic-build.log"
+  fi
   rm -f "$SECRET_FILE" "$LOG_FILE"
   if [ -n "${HISTORY_FILE:-}" ]; then rm -f "$HISTORY_FILE"; fi
   if [ -n "${LABELS_FILE:-}" ]; then rm -f "$LABELS_FILE"; fi
