@@ -1,14 +1,14 @@
 {
   "schema": "averion.openreply.egress.v1",
   "releaseCandidateSha": "727d364cbc7ac6fb9ce1825c3c43599a0e1a7b10",
-  "enforcement": "UNAVAILABLE",
-  "enforcementNote": "No host firewall or egress proxy was installed. This is an inventory of destinations found in the release-candidate source. Ingress deny stops the routes that would call Zernio or render the marketing page.",
+  "enforcement": "NOT_IMPLEMENTED",
+  "enforcementNote": "EGRESS_INVENTORY is this file. EGRESS_ENFORCEMENT is NOT_IMPLEMENTED. Docker Compose bridge networks do not filter outbound traffic by destination hostname. See docs/averion/p2b/EGRESS_ADR.md. Choice B defers that control to a staging infrastructure gate.",
   "destinations": [
     {
       "host": "graph.instagram.com",
       "port": 443,
       "callers": ["lib/meta/client.ts"],
-      "when": "OAuth completion, inbox reads, cron token refresh, and worker sends. Worker job dispatch returns before any send when OPENREPLY_AUTOMATIONS_ENABLED=false. attachPendingNextReels still calls getUserMedia when a pendingNextReel row exists; a database with no such rows does not call Meta."
+      "when": "OAuth completion, inbox reads, cron token refresh, and worker sends. Worker job dispatch returns before any send when OPENREPLY_AUTOMATIONS_ENABLED=false. attachPendingNextReels loads pendingNextReel rows and returns before createInstagramContext or getUserMedia while automations are disabled."
     },
     {
       "host": "graph.facebook.com",
@@ -72,8 +72,8 @@
     {
       "host": "web",
       "port": 3000,
-      "callers": ["cron"],
-      "when": "CRON_BASE_URL=http://web:3000. Not published on the host."
+      "callers": ["cron", "public-edge"],
+      "when": "CRON_BASE_URL=http://web:3000 on the internal network. public-edge proxies only PUBLIC_REQUIRED requests to http://web:3000 on the edge network. web publishes no host port."
     },
     {
       "host": "/_vercel/insights/script.js",

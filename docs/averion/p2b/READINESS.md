@@ -19,4 +19,4 @@ Deploy gate, this wave: `averion/deploy/check-readiness.mjs` runs before `prisma
 
 `averion/artifacts/readiness-result.json` records the fixture proof. The passing fixture is ready. Empty allowlist, automations on, human send on, upstream profile, placeholder secrets, a reused cron secret, and a localhost database are not ready.
 
-The compose file was not started, so this did not observe a live `/api/health` response.
+The provider compose file was started later for the public-edge probe. That probe's web process is the webhook handler harness, not `npm run start`, so it still does not observe a live Next.js `/api/health` response. The public edge denies `GET /api/health` before any process could answer it.

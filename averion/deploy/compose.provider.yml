@@ -1,11 +1,29 @@
 name: openreply-averion-p2b
-# Deployment topology for the frozen OpenReply release candidate.
-# No host ports are published. Postgres, Redis, the web process, the worker,
-# and cron share the internal network only. The public edge is
-# averion/deploy/ingress-edge.mjs enforcing averion/deploy/ingress-policy.json.
-# This file does not start that edge and does not deploy to production.
+# Deployment topology for the OpenReply provider profile.
+# Public internet reaches only public-edge. That process proxies PUBLIC_REQUIRED
+# requests to web:3000 and refuses everything else. web has no host port.
+# Postgres, Redis, the worker, and cron are on the internal network only.
 
 services:
+  public-edge:
+    image: docker.io/library/node@sha256:3d0f05455dea2c82e2f76e7e2543964c30f6b7d673fc1a83286736d44fe4c41c
+    command: ["node", "/config/ingress-edge.mjs"]
+    environment:
+      INGRESS_LISTENER: public
+      INGRESS_BIND: 0.0.0.0
+      INGRESS_PORT: "8080"
+      OPENREPLY_UPSTREAM_URL: http://web:3000
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./ingress-edge.mjs:/config/ingress-edge.mjs:ro
+      - ./ingress-policy.json:/config/ingress-policy.json:ro
+    depends_on:
+      web:
+        condition: service_started
+    networks: [edge]
+    restart: unless-stopped
+
   postgres:
     image: docker.io/library/postgres@sha256:a85daf0dbd5e79586e850e3fe4b21b796799828ad015ce2166aeb98cc24da61c
     environment:
@@ -15,6 +33,11 @@ services:
     secrets:
       - postgres_password
     networks: [internal]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U openreply -d openreply"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
     restart: unless-stopped
 
   redis:
@@ -46,7 +69,12 @@ services:
       - ./check-readiness.mjs:/config/check-readiness.mjs:ro
       - ./ingress-edge.mjs:/config/ingress-edge.mjs:ro
       - ./ingress-policy.json:/config/ingress-policy.json:ro
-    networks: [internal]
+    networks: [edge, internal]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
     restart: unless-stopped
     expose: ["3000"]
 
@@ -84,11 +112,13 @@ services:
     restart: unless-stopped
 
 networks:
+  edge:
+    driver: bridge
   internal:
     # Bridge with no published ports. Not docker "internal: true": that mode
-    # also blocks outbound calls to Meta and the mail provider, which the
-    # webhook and sign-in paths require. Host firewall must not publish
-    # 3000, 5432, or 6379.
+    # also blocks outbound calls the webhook and sign-in paths require.
+    # This network does not filter outbound hostnames. See EGRESS_ADR.md.
+    driver: bridge
 
 secrets:
   postgres_password:

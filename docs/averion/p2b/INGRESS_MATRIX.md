@@ -5,6 +5,8 @@ Every app route file and public file is listed. Unmatched paths are DENY.
 Listeners: `public` accepts only PUBLIC_REQUIRED, `private` accepts only PRIVATE_SERVICE, `ops` accepts only OPS_ONLY.
 A route with classification DENY has no listener.
 
+The running public edge is a reverse proxy, not a 204 oracle. `ALLOW` forwards the original method, query string, headers, and raw body to `web:3000`. `DENY` is HTTP 403 and is not forwarded. The edge does not verify `x-hub-signature-256`. OpenReply still does that on `POST /api/webhook`. Only the public listener is published.
+
 | id | methods | pattern | classification | listeners | source |
 | --- | --- | --- | --- | --- | --- |
 | meta-webhook-verify | GET,HEAD | `/api/webhook` | PUBLIC_REQUIRED | public | `app/api/webhook/route.ts` |

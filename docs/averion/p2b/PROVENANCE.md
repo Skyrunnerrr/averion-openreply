@@ -1,8 +1,10 @@
 # Image provenance
 
+`APP_IMAGE_UNCHANGED=NO` for this deployment head. `lib/automation/attach-next-reel.ts` now returns before any Instagram client call when automations are disabled. That file is copied into the runner image. The digest below was built from `727d364cbc7ac6fb9ce1825c3c43599a0e1a7b10` and is not a digest of this head. No replacement build was recorded in this closure.
+
 | Field | Value |
 | --- | --- |
-| SOURCE_SHA | `727d364cbc7ac6fb9ce1825c3c43599a0e1a7b10` |
+| SOURCE_SHA of the recorded image | `727d364cbc7ac6fb9ce1825c3c43599a0e1a7b10` |
 | Parent | `075020817b18cf65b548d474e0ce86b8b7b7dbb8` (empty diff) |
 | UPSTREAM_PIN | `5760181c4bb9683241357cbbcd8ca635d19f835a` |
 | LOCKFILE_SHA256 | `df7f69b394d4fd22a076448b86a6ef0a489d240259661fd07105e76ade389416` |
@@ -27,7 +29,7 @@ License manifest: `averion/artifacts/license-manifest.json`. Project license is 
 
 Postgres and Redis references are the linux/amd64 manifest digests in `averion/deploy/base-image-pins.json`. The mutable tags `postgres:16`, `redis:7-alpine`, and `node:20-slim` are not used by the provider compose file or the deploy Dockerfile.
 
-Two `--no-cache` builds from a clean `git archive` of SOURCE_SHA, with `SOURCE_DATE_EPOCH=1790583091` and the same build args, both produced OCI manifest `sha256:4ba1cb451075e593880ca1f760c913134537a64e26ad0e2bd5c28d1929ffe677`. The blob hash matches that digest. `.next/BUILD_ID` inside the image is the source SHA. `PROVIDER_IMAGES_REPRODUCIBLE=PASS`.
+Two `--no-cache` builds from a clean `git archive` of `727d364cbc7ac6fb9ce1825c3c43599a0e1a7b10`, with `SOURCE_DATE_EPOCH=1790583091` and the same build args, both produced OCI manifest `sha256:4ba1cb451075e593880ca1f760c913134537a64e26ad0e2bd5c28d1929ffe677`. The blob hash matches that digest. `.next/BUILD_ID` inside that image is that source SHA. Those two builds are reproducible for that SHA only. `OPENREPLY_IMAGE_REPRODUCIBLE=NO` for this deployment head until two builds of the head that contains the kill-switch change match.
 
 The image build pins `generateBuildId` to SOURCE_SHA, sets `NEXT_TELEMETRY_DISABLED=1`, sets `experimental.cpus` to 1, and sets `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` to `base64(sha256("averion-openreply-p2b-" + SOURCE_SHA))`. That key is a public determinism constant, not an operator secret. Preview-mode keys in `prerender-manifest.json` are rewritten from the same SHA. `api.github.com` is pointed at `0.0.0.0` only during `next build`. Apt logs and the ldconfig aux-cache are deleted after `wget` is installed. `.next/cache`, `.next/trace`, `.next/trace-build`, and `.next/diagnostics` are omitted.
 

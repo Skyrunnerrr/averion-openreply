@@ -1,3 +1,4 @@
+import { createServer } from "node:http";
 import { readFileSync, writeFileSync } from "node:fs";
 import { createConnection } from "node:net";
 import { join } from "node:path";
@@ -167,17 +168,36 @@ const cases = [
   },
 ];
 
+const upstreamHits = [];
+const upstream = await new Promise((resolve) => {
+  const server = createServer((request, response) => {
+    upstreamHits.push({ method: request.method, path: (request.url ?? "/").split("?")[0] });
+    request.resume();
+    response.writeHead(200, { "content-type": "application/json", "cache-control": "no-store" });
+    response.end(JSON.stringify({ handler: "red-team-upstream" }));
+  });
+  server.listen(0, "127.0.0.1", () => resolve(server));
+});
+const upstreamPort = upstream.address().port;
+const upstreamUrl = `http://127.0.0.1:${upstreamPort}`;
+
 const servers = await Promise.all([
-  startListener("public", PUBLIC_PORT),
-  startListener("private", PRIVATE_PORT),
-  startListener("ops", OPS_PORT),
+  startListener("public", PUBLIC_PORT, "127.0.0.1", { upstream: upstreamUrl }),
+  startListener("private", PRIVATE_PORT, "127.0.0.1", { upstream: upstreamUrl }),
+  startListener("ops", OPS_PORT, "127.0.0.1", { upstream: upstreamUrl }),
 ]);
 
 const httpResults = [];
 for (const item of cases) {
   const http = await request(item.port, item.method, item.path, item.body);
   const policy = decide(item.port === PUBLIC_PORT ? "public" : "private", item.method, item.path);
-  const pass = http.header === item.expect && http.status === (item.expect === "ALLOW" ? 204 : 403);
+  const forwarded = upstreamHits.some(
+    (hit) => hit.method === item.method && hit.path === item.path.split("?")[0]
+  );
+  const pass =
+    item.expect === "DENIED"
+      ? http.header === "DENIED" && http.status === 403 && forwarded === false
+      : http.header === "ALLOW" && http.status === 200 && forwarded === true;
   httpResults.push({
     name: item.name,
     method: item.method,
@@ -192,7 +212,10 @@ for (const item of cases) {
 }
 
 const compose = readFileSync(join(import.meta.dirname, "compose.provider.yml"), "utf8");
-const composePublishesPorts = /^\s*ports\s*:/m.test(compose);
+const portMappings = [...compose.matchAll(/^\s+-\s+"(\d+):(\d+)"/gm)].map((match) => `${match[1]}:${match[2]}`);
+const composePublishesPorts = portMappings.length > 0;
+const composePublishesOnlyPublicEdge = portMappings.length === 1 && portMappings[0] === "8080:8080";
+const composeLeaksPrivatePorts = /^\s+-\s+"\d+:(3000|5432|6379)"/m.test(compose);
 const imageLines = compose.split("\n").filter((line) => line.trim().startsWith("image:"));
 const composePinsDigests = [
   "sha256:a85daf0dbd5e79586e850e3fe4b21b796799828ad015ce2166aeb98cc24da61c",
@@ -229,24 +252,40 @@ const unreachable = {
 };
 
 const opsHealth = await request(OPS_PORT, "GET", "/api/health");
+const hitsBeforePublicHealth = upstreamHits.length;
 const publicHealth = await request(PUBLIC_PORT, "GET", "/api/health");
+const publicHealthForwarded = upstreamHits.length !== hitsBeforePublicHealth;
 
 const result = {
+  kind: "PROXY_TEST",
   liveInfra: "SIMULATED",
-  description: "External requests hit a local public edge that enforces averion/deploy/ingress-policy.json. The OpenReply application process was not started and no Meta call was made.",
+  description:
+    "POLICY decisions come from decide(). PROXY_TEST forwards ALLOW to a local upstream and returns 403 for DENY. This file does not start compose and is not the REAL_NETWORK_TEST.",
   http: httpResults,
   unreachable,
   controls: {
-    opsHealth: { status: opsHealth.status, decision: opsHealth.header, pass: opsHealth.header === "ALLOW" && opsHealth.status === 204 },
-    publicHealth: { status: publicHealth.status, decision: publicHealth.header, pass: publicHealth.header === "DENIED" && publicHealth.status === 403 },
+    opsHealth: { status: opsHealth.status, decision: opsHealth.header, pass: opsHealth.header === "ALLOW" && opsHealth.status === 200 },
+    publicHealth: {
+      status: publicHealth.status,
+      decision: publicHealth.header,
+      forwarded: publicHealthForwarded,
+      pass: publicHealth.header === "DENIED" && publicHealth.status === 403 && publicHealthForwarded === false,
+    },
   },
 };
 
 result.compose = {
   publishesHostPorts: composePublishesPorts,
+  published: portMappings,
+  publishesOnlyPublicEdge: composePublishesOnlyPublicEdge,
+  leaksPrivatePorts: composeLeaksPrivatePorts,
   pinsProviderDigests: composePinsDigests,
   mutableTag: composeHasMutableTag,
-  pass: composePublishesPorts === false && composePinsDigests && composeHasMutableTag === false,
+  pass:
+    composePublishesOnlyPublicEdge &&
+    composeLeaksPrivatePorts === false &&
+    composePinsDigests &&
+    composeHasMutableTag === false,
 };
 result.pass =
   httpResults.every((item) => item.pass) &&
@@ -260,4 +299,5 @@ writeFileSync(out, `${JSON.stringify(result, null, 2)}\n`);
 console.log(JSON.stringify({ pass: result.pass, failed: httpResults.filter((item) => !item.pass), worker: unreachable.worker }));
 
 for (const server of servers) server.close();
+upstream.close();
 process.exit(result.pass ? 0 : 1);

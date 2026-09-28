@@ -1,4 +1,6 @@
 {
+  "appImageUnchanged": false,
+  "appImageUnchangedReason": "lib/automation/attach-next-reel.ts returns before any Instagram client call when OPENREPLY_AUTOMATIONS_ENABLED=false. That file is in the runner image. The digest in this file was built from sourceSha and has not been rebuilt for the deployment head.",
   "sourceSha": "727d364cbc7ac6fb9ce1825c3c43599a0e1a7b10",
   "parentSha": "075020817b18cf65b548d474e0ce86b8b7b7dbb8",
   "parentDiff": "empty",

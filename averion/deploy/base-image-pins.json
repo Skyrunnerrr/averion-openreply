@@ -10,7 +10,7 @@
       "indexDigest": "sha256:2cf067cfed83d5ea958367df9f966191a942351a2df77d6f0193e162b5febfc0",
       "platform": "linux/amd64",
       "manifestDigest": "sha256:3d0f05455dea2c82e2f76e7e2543964c30f6b7d673fc1a83286736d44fe4c41c",
-      "usedBy": "averion/deploy/Dockerfile"
+      "usedBy": "averion/deploy/Dockerfile and the public-edge service in averion/deploy/compose.provider.yml"
     },
     {
       "role": "postgres",

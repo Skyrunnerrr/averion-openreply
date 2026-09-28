@@ -1,6 +1,7 @@
 {
+  "kind": "PROXY_TEST",
   "liveInfra": "SIMULATED",
-  "description": "External requests hit a local public edge that enforces averion/deploy/ingress-policy.json. The OpenReply application process was not started and no Meta call was made.",
+  "description": "POLICY decisions come from decide(). PROXY_TEST forwards ALLOW to a local upstream and returns 403 for DENY. This file does not start compose and is not the REAL_NETWORK_TEST.",
   "http": [
     {
       "name": "dashboard-direct-dm-ui",
@@ -151,7 +152,7 @@
       "path": "/api/webhook",
       "listener": "public",
       "expected": "ALLOW",
-      "status": 204,
+      "status": 200,
       "decision": "ALLOW",
       "policy": "ALLOW",
       "pass": true
@@ -162,7 +163,7 @@
       "path": "/api/webhook",
       "listener": "public",
       "expected": "ALLOW",
-      "status": 204,
+      "status": 200,
       "decision": "ALLOW",
       "policy": "ALLOW",
       "pass": true
@@ -195,18 +196,24 @@
   },
   "controls": {
     "opsHealth": {
-      "status": 204,
+      "status": 200,
       "decision": "ALLOW",
       "pass": true
     },
     "publicHealth": {
       "status": 403,
       "decision": "DENIED",
+      "forwarded": false,
       "pass": true
     }
   },
   "compose": {
-    "publishesHostPorts": false,
+    "publishesHostPorts": true,
+    "published": [
+      "8080:8080"
+    ],
+    "publishesOnlyPublicEdge": true,
+    "leaksPrivatePorts": false,
     "pinsProviderDigests": true,
     "mutableTag": false,
     "pass": true

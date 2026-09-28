@@ -1,0 +1,224 @@
+{
+  "policyTest": {
+    "kind": "POLICY_TEST",
+    "pass": true,
+    "checks": [
+      {
+        "method": "GET",
+        "path": "/api/webhook",
+        "expected": "ALLOW",
+        "decision": "ALLOW",
+        "pass": true
+      },
+      {
+        "method": "POST",
+        "path": "/api/webhook",
+        "expected": "ALLOW",
+        "decision": "ALLOW",
+        "pass": true
+      },
+      {
+        "method": "POST",
+        "path": "/api/instagram/conversations",
+        "expected": "DENIED",
+        "decision": "DENIED",
+        "pass": true
+      },
+      {
+        "method": "POST",
+        "path": "/api/automations",
+        "expected": "DENIED",
+        "decision": "DENIED",
+        "pass": true
+      },
+      {
+        "method": "GET",
+        "path": "/inbox",
+        "expected": "DENIED",
+        "decision": "DENIED",
+        "pass": true
+      },
+      {
+        "method": "GET",
+        "path": "/",
+        "expected": "DENIED",
+        "decision": "DENIED",
+        "pass": true
+      },
+      {
+        "method": "GET",
+        "path": "/api/health",
+        "expected": "DENIED",
+        "decision": "DENIED",
+        "pass": true
+      }
+    ]
+  },
+  "handlerTest": {
+    "kind": "HANDLER_TEST",
+    "upstream": "app/api/webhook/route.ts",
+    "pass": true,
+    "invalidSignatureStatus": 401,
+    "invalidSignatureDecision": "ALLOW",
+    "validSignatureStatus": 500,
+    "bodyHashEqual": true,
+    "signatureHeaderPreserved": true,
+    "queryPreserved": true,
+    "handler": "app/api/webhook/route.ts",
+    "denied": [
+      {
+        "method": "POST",
+        "path": "/api/instagram/conversations",
+        "status": 403,
+        "decision": "DENIED",
+        "leakedCanary": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/automations",
+        "status": 403,
+        "decision": "DENIED",
+        "leakedCanary": false
+      },
+      {
+        "method": "GET",
+        "path": "/inbox",
+        "status": 403,
+        "decision": "DENIED",
+        "leakedCanary": false
+      },
+      {
+        "method": "GET",
+        "path": "/",
+        "status": 403,
+        "decision": "DENIED",
+        "leakedCanary": false
+      },
+      {
+        "method": "GET",
+        "path": "/api/health",
+        "status": 403,
+        "decision": "DENIED",
+        "leakedCanary": false
+      }
+    ],
+    "forwardedDenied": false,
+    "leakedLog": false,
+    "webhookHitCount": 3
+  },
+  "realNetworkTest": {
+    "kind": "REAL_NETWORK_TEST",
+    "pass": true,
+    "bridgeForwarding": {
+      "legacyForwardWasDrop": false,
+      "adjusted": false
+    },
+    "topology": {
+      "publicEdgeNetworks": [
+        "edge"
+      ],
+      "webNetworks": [
+        "edge",
+        "internal"
+      ],
+      "postgresNetworks": [
+        "internal"
+      ],
+      "redisNetworks": [
+        "internal"
+      ],
+      "workerNetworks": [
+        "internal"
+      ],
+      "cronNetworks": [
+        "internal"
+      ],
+      "publicEdgePorts": [
+        "8080:8080"
+      ],
+      "webPorts": [],
+      "postgresPorts": [],
+      "redisPorts": [],
+      "workerPorts": [],
+      "cronPorts": []
+    },
+    "topologyPass": true,
+    "migrations": {
+      "ok": true,
+      "count": 22
+    },
+    "edgeUp": true,
+    "imageUnderTest": "probe-source-mount-of-app/api/webhook/route.ts",
+    "productionImageStarted": false,
+    "webhook": {
+      "status": 401,
+      "decision": "ALLOW",
+      "handler": "app/api/webhook/route.ts",
+      "bodyHashEqual": true,
+      "signatureHeaderPreserved": true,
+      "leakedCanary": false
+    },
+    "verify": {
+      "status": 200,
+      "decision": "ALLOW",
+      "queryPreserved": true
+    },
+    "denied": [
+      {
+        "method": "POST",
+        "path": "/api/instagram/conversations",
+        "status": 403,
+        "decision": "DENIED",
+        "leakedCanary": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/automations",
+        "status": 403,
+        "decision": "DENIED",
+        "leakedCanary": false
+      },
+      {
+        "method": "GET",
+        "path": "/inbox",
+        "status": 403,
+        "decision": "DENIED",
+        "leakedCanary": false
+      },
+      {
+        "method": "GET",
+        "path": "/",
+        "status": 403,
+        "decision": "DENIED",
+        "leakedCanary": false
+      },
+      {
+        "method": "GET",
+        "path": "/api/health",
+        "status": 403,
+        "decision": "DENIED",
+        "leakedCanary": false
+      }
+    ],
+    "directFromHost": {
+      "web3000": false,
+      "postgres5432": false,
+      "redis6379": false
+    },
+    "externalClient": {
+      "3000": false,
+      "5432": false,
+      "6379": false,
+      "8080": true
+    },
+    "publicEdgeToPostgresExit": 0,
+    "persistence": {
+      "queryStatus": 0,
+      "rowSeen": true,
+      "leakedCanary": false,
+      "leakedSignature": false,
+      "leakedBodyPreview": false
+    }
+  },
+  "pass": true
+}
