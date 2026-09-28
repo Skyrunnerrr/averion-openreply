@@ -23,7 +23,7 @@ WORKDIR /app
 ARG SOURCE_SHA
 ARG LOCKFILE_SHA256
 ARG SOURCE_DATE_EPOCH=1790583091
-ARG SERVER_ACTION_KEY_FINGERPRINT
+ARG OPENREPLY_ACTION_FINGERPRINT
 RUN test -n "$SOURCE_SHA" && test -n "$LOCKFILE_SHA256" && test -n "$SOURCE_DATE_EPOCH"
 
 ENV SOURCE_SHA=${SOURCE_SHA} \
@@ -45,17 +45,17 @@ RUN grep -q 'api.github.com' /etc/hosts || printf '\n0.0.0.0 api.github.com\n' >
 
 RUN --mount=type=secret,id=next_server_actions_key,required=true \
     set -eu; \
-    set -o pipefail; \
-    key="$(cat /run/secrets/next_server_actions_key)"; \
-    key="$(printf '%s' "$key" | tr -d '\r\n')"; \
-    test -n "$key"; \
-    raw_len="$(printf '%s' "$key" | base64 -d | wc -c | tr -d ' ')"; \
-    test "$raw_len" = "32"; \
-    fp="$(printf '%s' "$key" | base64 -d | sha256sum | awk '{print $1}')"; \
-    test -n "$SERVER_ACTION_KEY_FINGERPRINT"; \
-    test "$fp" = "$SERVER_ACTION_KEY_FINGERPRINT"; \
-    export NEXT_SERVER_ACTIONS_ENCRYPTION_KEY="$key"; \
-    unset key fp raw_len; \
+    umask 077; \
+    tr -d '\r\n' < /run/secrets/next_server_actions_key > /tmp/sa-key-b64; \
+    test -s /tmp/sa-key-b64; \
+    base64 -d /tmp/sa-key-b64 > /tmp/sa-key-raw; \
+    test "$(wc -c < /tmp/sa-key-raw | tr -d ' ')" = "32"; \
+    fp="$(sha256sum /tmp/sa-key-raw | awk '{print $1}')"; \
+    test -n "$OPENREPLY_ACTION_FINGERPRINT"; \
+    test "$fp" = "$OPENREPLY_ACTION_FINGERPRINT"; \
+    export NEXT_SERVER_ACTIONS_ENCRYPTION_KEY="$(cat /tmp/sa-key-b64)"; \
+    rm -f /tmp/sa-key-b64 /tmp/sa-key-raw; \
+    unset fp; \
     npm run build \
  && node /tmp/normalize-next-output.mjs \
  && rm /tmp/normalize-next-output.mjs \
@@ -68,7 +68,7 @@ WORKDIR /app
 ARG SOURCE_SHA
 ARG LOCKFILE_SHA256
 ARG SOURCE_DATE_EPOCH=1790583091
-ARG SERVER_ACTION_KEY_FINGERPRINT
+ARG OPENREPLY_ACTION_FINGERPRINT
 ARG DEBIAN_SNAPSHOT=20260421T000000Z
 ARG WGET_VERSION=1.21.3-1+deb12u1
 
@@ -86,7 +86,7 @@ LABEL org.opencontainers.image.base.digest="sha256:3d0f05455dea2c82e2f76e7e25439
 LABEL org.openreply.lockfile.sha256="${LOCKFILE_SHA256}"
 LABEL org.openreply.source.sha="${SOURCE_SHA}"
 LABEL org.openreply.source-date-epoch="${SOURCE_DATE_EPOCH}"
-LABEL org.openreply.server-action-key-fingerprint="${SERVER_ACTION_KEY_FINGERPRINT}"
+LABEL org.openreply.server-action-key-fingerprint="${OPENREPLY_ACTION_FINGERPRINT}"
 LABEL org.openreply.canonical-image="false"
 
 RUN set -eu; \

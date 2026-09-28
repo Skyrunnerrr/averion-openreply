@@ -5,27 +5,28 @@
 FROM docker.io/library/node@sha256:3d0f05455dea2c82e2f76e7e2543964c30f6b7d673fc1a83286736d44fe4c41c
 WORKDIR /tmp/proof
 
-ARG SERVER_ACTION_KEY_FINGERPRINT
+ARG OPENREPLY_ACTION_FINGERPRINT
 ARG DEBIAN_SNAPSHOT=20260421T000000Z
 ARG WGET_VERSION=1.21.3-1+deb12u1
 
 LABEL org.openreply.synthetic-builder-proof="true"
 LABEL org.openreply.canonical-image="false"
-LABEL org.openreply.server-action-key-fingerprint="${SERVER_ACTION_KEY_FINGERPRINT}"
+LABEL org.openreply.server-action-key-fingerprint="${OPENREPLY_ACTION_FINGERPRINT}"
 
 RUN --mount=type=secret,id=next_server_actions_key,required=true \
     set -eu; \
-    set -o pipefail; \
-    key="$(cat /run/secrets/next_server_actions_key)"; \
-    key="$(printf '%s' "$key" | tr -d '\r\n')"; \
-    test -n "$key"; \
-    raw_len="$(printf '%s' "$key" | base64 -d | wc -c | tr -d ' ')"; \
-    test "$raw_len" = "32"; \
-    fp="$(printf '%s' "$key" | base64 -d | sha256sum | awk '{print $1}')"; \
-    test "$fp" = "$SERVER_ACTION_KEY_FINGERPRINT"; \
+    umask 077; \
+    tr -d '\r\n' < /run/secrets/next_server_actions_key > /tmp/sa-key-b64; \
+    test -s /tmp/sa-key-b64; \
+    base64 -d /tmp/sa-key-b64 > /tmp/sa-key-raw; \
+    test "$(wc -c < /tmp/sa-key-raw | tr -d ' ')" = "32"; \
+    fp="$(sha256sum /tmp/sa-key-raw | awk '{print $1}')"; \
+    test -n "$OPENREPLY_ACTION_FINGERPRINT"; \
+    test "$fp" = "$OPENREPLY_ACTION_FINGERPRINT"; \
     mkdir -p /etc/openreply; \
     printf '%s\n' "$fp" > /etc/openreply/server-action-key-fingerprint; \
-    unset key fp raw_len
+    rm -f /tmp/sa-key-b64 /tmp/sa-key-raw; \
+    unset fp
 
 RUN set -eu; \
     rm -rf /etc/apt/sources.list /etc/apt/sources.list.d; \

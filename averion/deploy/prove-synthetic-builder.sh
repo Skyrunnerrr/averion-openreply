@@ -89,7 +89,7 @@ BUILDX_BIN="$ROOT/averion/deploy/.cache/buildx-v0.37.1"
   --builder "$BUILDER_NAME" \
   --platform linux/amd64 \
   --secret "id=next_server_actions_key,src=${SECRET_FILE}" \
-  --build-arg "SERVER_ACTION_KEY_FINGERPRINT=${FINGERPRINT}" \
+  --build-arg "OPENREPLY_ACTION_FINGERPRINT=${FINGERPRINT}" \
   --build-arg DEBIAN_SNAPSHOT=20260421T000000Z \
   --build-arg WGET_VERSION=1.21.3-1+deb12u1 \
   --progress=plain \
