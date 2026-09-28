@@ -357,7 +357,8 @@ function ensureBridgeForwarding() {
 async function networkTest() {
   const bridgeForwarding = ensureBridgeForwarding();
   writeProbeSecrets();
-  const imageRef = "openreply@sha256:4ba1cb451075e593880ca1f760c913134537a64e26ad0e2bd5c28d1929ffe677";
+  // Recorded OCI manifest of ea2b1c6e…. Satisfies ${OPENREPLY_IMAGE_REF}. The probe replaces the web image.
+  const imageRef = "openreply@sha256:8f44fe4f707ff86993d93ad222bafdaf3a314fbf704e33cfd64a433042f24b23";
   const configRun = docker([
     "compose",
     "-p",
@@ -660,7 +661,7 @@ try {
   result.realNetworkTest = { kind: "REAL_NETWORK_TEST", pass: false, error: redact(error.stack || error.message).slice(0, 800) };
 } finally {
   docker(["compose", "-p", project, "-f", "compose.provider.yml", "-f", "compose.probe.yml", "down", "-v", "--remove-orphans"], {
-    env: { OPENREPLY_IMAGE_REF: "openreply@sha256:4ba1cb451075e593880ca1f760c913134537a64e26ad0e2bd5c28d1929ffe677" },
+    env: { OPENREPLY_IMAGE_REF: "openreply@sha256:8f44fe4f707ff86993d93ad222bafdaf3a314fbf704e33cfd64a433042f24b23" },
     timeout: 120000,
   });
 }

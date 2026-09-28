@@ -1,9 +1,9 @@
 {
   "appImageUnchanged": false,
-  "appImageUnchangedReason": "lib/automation/attach-next-reel.ts returns before any Instagram client call when OPENREPLY_AUTOMATIONS_ENABLED=false. That file is in the runner image. The digest in this file was built from sourceSha and has not been rebuilt for the deployment head.",
-  "sourceSha": "727d364cbc7ac6fb9ce1825c3c43599a0e1a7b10",
-  "parentSha": "075020817b18cf65b548d474e0ce86b8b7b7dbb8",
-  "parentDiff": "empty",
+  "appImageUnchangedReason": "lib/automation/attach-next-reel.ts returns before any Instagram client call when OPENREPLY_AUTOMATIONS_ENABLED=false. That file is in the runner image at /app/lib/automation/attach-next-reel.ts. This imageDigest was built from sourceSha.",
+  "imageMatchesSourceSha": true,
+  "sourceSha": "ea2b1c6e0a88eaeb0fa3daefaf0b0f869bb7566c",
+  "parentSha": "435dc820a981091a660dad3ab38860d6e044e5e8",
   "upstreamPin": "5760181c4bb9683241357cbbcd8ca635d19f835a",
   "lockfileSha256": "df7f69b394d4fd22a076448b86a6ef0a489d240259661fd07105e76ade389416",
   "lockfileCheck": "package-lock.json: OK",
@@ -12,38 +12,52 @@
   "extraBuildContext": "averion/deploy",
   "baseImage": "docker.io/library/node@sha256:3d0f05455dea2c82e2f76e7e2543964c30f6b7d673fc1a83286736d44fe4c41c",
   "sourceDateEpoch": 1790583091,
+  "sourceDateEpochNote": "Dockerfile default and the prior determinism epoch (2026-09-28T08:11:31Z). Passed to podman --timestamp and SOURCE_DATE_EPOCH. sourceSha commit time is 2026-09-28T12:52:53Z.",
   "imageCreated": "2026-09-28T08:11:31Z",
   "buildArgs": {
-    "SOURCE_SHA": "727d364cbc7ac6fb9ce1825c3c43599a0e1a7b10",
+    "SOURCE_SHA": "ea2b1c6e0a88eaeb0fa3daefaf0b0f869bb7566c",
     "LOCKFILE_SHA256": "df7f69b394d4fd22a076448b86a6ef0a489d240259661fd07105e76ade389416",
     "SOURCE_DATE_EPOCH": "1790583091"
   },
   "determinism": {
     "generateBuildId": "SOURCE_SHA",
     "nextTelemetryDisabled": "1",
-    "serverActionsEncryptionKey": "base64(sha256(\"averion-openreply-p2b-\" + SOURCE_SHA))",
+    "serverActionsEncryptionKey": "committed literal bBlyVERylKvU8K2Pp8RHTM4GfW6Celhb5B8uyLaeRuA=",
+    "serverActionsEncryptionKeyNote": "The Dockerfile comment describes base64(sha256(\"averion-openreply-p2b-\" + SOURCE_SHA)). The ENV literal equals that formula for 727d364cbc7ac6fb9ce1825c3c43599a0e1a7b10. Both builds of sourceSha used the committed literal. The formula was not recomputed for sourceSha.",
     "previewKeys": "sha256(SOURCE_SHA + label) truncated in averion/deploy/normalize-next-output.mjs",
     "githubStars": "api.github.com forced to 0.0.0.0 during next build",
     "aptLogsRemoved": true,
     "experimentalCpus": 1
   },
-  "buildWallClock": {
-    "firstStart": "2026-09-28T08:42:26Z",
-    "secondStart": "2026-09-28T08:43:31Z",
-    "end": "2026-09-28T08:44:30Z"
+  "runtimeProof": {
+    "buildIdInsideImage": "ea2b1c6e0a88eaeb0fa3daefaf0b0f869bb7566c",
+    "attachPendingNextReelsPath": "/app/lib/automation/attach-next-reel.ts",
+    "areAutomationsEnabledLines": [2, 33]
   },
-  "imageDigest": "sha256:4ba1cb451075e593880ca1f760c913134537a64e26ad0e2bd5c28d1929ffe677",
+  "buildWallClock": {
+    "firstStart": "2026-09-28T12:58:05Z",
+    "firstEnd": "2026-09-28T12:59:20Z",
+    "secondStart": "2026-09-28T12:59:49Z",
+    "secondEnd": "2026-09-28T13:00:51Z"
+  },
+  "imageDigest": "sha256:8f44fe4f707ff86993d93ad222bafdaf3a314fbf704e33cfd64a433042f24b23",
   "imageDigestKind": "oci-manifest",
-  "configDigest": "sha256:6703eab9533313c827f22ff7f6d6df84df6599f8884b82ffb50906e2a14d737a",
-  "podmanStorageDigest": "sha256:ef12e3bc70f64fa27b254a61859d20ee11584224dfd13da0a3fd395a08a32791",
+  "configDigest": "sha256:833ffa4b7b0420fa3fa10078215c55f5d3bd7105be7fb0f256ddfa4c8aa18cc2",
+  "podmanStorageDigest": "sha256:c9ea26c3d21dbeddfb4df90b14f4332e2ba314bee8efe7193f0f1afada6980d5",
   "registryPush": false,
   "reproducibleBuilds": {
     "noCache": true,
     "sameSourceDateEpoch": true,
-    "firstOciManifestDigest": "sha256:4ba1cb451075e593880ca1f760c913134537a64e26ad0e2bd5c28d1929ffe677",
-    "secondOciManifestDigest": "sha256:4ba1cb451075e593880ca1f760c913134537a64e26ad0e2bd5c28d1929ffe677",
+    "firstOciManifestDigest": "sha256:8f44fe4f707ff86993d93ad222bafdaf3a314fbf704e33cfd64a433042f24b23",
+    "secondOciManifestDigest": "sha256:8f44fe4f707ff86993d93ad222bafdaf3a314fbf704e33cfd64a433042f24b23",
     "match": true,
-    "buildIdInsideImage": "727d364cbc7ac6fb9ce1825c3c43599a0e1a7b10"
+    "buildIdInsideImage": "ea2b1c6e0a88eaeb0fa3daefaf0b0f869bb7566c"
+  },
+  "previousImage": {
+    "sourceSha": "727d364cbc7ac6fb9ce1825c3c43599a0e1a7b10",
+    "imageDigest": "sha256:4ba1cb451075e593880ca1f760c913134537a64e26ad0e2bd5c28d1929ffe677",
+    "configDigest": "sha256:6703eab9533313c827f22ff7f6d6df84df6599f8884b82ffb50906e2a14d737a",
+    "podmanStorageDigest": "sha256:ef12e3bc70f64fa27b254a61859d20ee11584224dfd13da0a3fd395a08a32791"
   },
   "previousNonReproducibleDigest": "sha256:07e3d86d164a5afe0548e1cc34a60f01632c20009162a03992b17bb58a01243d",
   "sbom": {
@@ -51,7 +65,8 @@
     "format": "CycloneDX",
     "specVersion": "1.5",
     "components": 568,
-    "sha256": "d93a43badf97ad17af4d32bfe19732033d49c08721bf816033ad9e28d625f412"
+    "sha256": "d93a43badf97ad17af4d32bfe19732033d49c08721bf816033ad9e28d625f412",
+    "note": "npm component SBOM from package-lock.json. Rechecked after the image rebuild. Lockfile bytes are unchanged, so this file was not regenerated. It is not an inventory of image filesystem paths."
   },
   "licenseManifest": "averion/artifacts/license-manifest.json"
 }
