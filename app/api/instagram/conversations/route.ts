@@ -7,6 +7,7 @@ import {
   MetaApiError,
 } from "@/lib/instagram/provider";
 import { createInstagramContext } from "@/lib/instagram/provider";
+import { isHumanSendEnabled } from "@/lib/provider-controls";
 
 export interface ConversationListItem {
   id: string;
@@ -99,13 +100,22 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// Send a direct message reply.
+// Send a direct message reply. This is the human SEND path. Ingest and the
+// GET read stay available when the gate is closed. Full network ingress
+// control is Wave 2B; this env gate is the code-side control.
 export async function POST(request: NextRequest) {
   const workspaceId = await getCurrentWorkspaceId();
   if (!workspaceId) {
     return NextResponse.json(
       { success: false, error: "Unauthorized" },
       { status: 401 }
+    );
+  }
+
+  if (!isHumanSendEnabled()) {
+    return NextResponse.json(
+      { success: false, error: "Human send is disabled." },
+      { status: 403 }
     );
   }
 

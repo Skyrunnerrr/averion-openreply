@@ -6,6 +6,7 @@ import {
   type FollowerCountPoint,
   type InstagramContext,
 } from "@/lib/instagram/provider";
+import { insightsPermissionRequested } from "@/lib/provider-controls";
 
 export interface FollowerHistoryPoint {
   /** ISO date (YYYY-MM-DD). */
@@ -100,6 +101,12 @@ export async function backfillFollowerHistory({
   instagramId: string;
   currentFollowers: number;
 }): Promise<number> {
+  // The follower_count insight edge needs instagram_business_manage_insights.
+  // The AVERION scope set does not request it, so do not call that edge.
+  if (accessToken.provider !== "ZERNIO" && !insightsPermissionRequested()) {
+    return 0;
+  }
+
   let points: { date: string; followers: number }[];
   try {
     if (accessToken.provider === "ZERNIO") {

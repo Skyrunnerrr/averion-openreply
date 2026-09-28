@@ -159,7 +159,7 @@ export default function OverviewPage() {
         </div>
       </div>
 
-      {!insightsAvailable && (
+      {!insightsAvailable && data.insightsScopeRequested !== false && (
         <div className="panel rounded p-4 border border-border">
           <p className="text-sm text-foreground">
             {t("Views, reach, saved and shares need the insights permission.")}

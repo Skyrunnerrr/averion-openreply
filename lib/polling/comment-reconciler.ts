@@ -38,6 +38,7 @@ import {
   type InstagramContext,
 } from "@/lib/instagram/provider";
 import { matchKeywords } from "@/lib/utils/keyword-matcher";
+import { areAutomationsEnabled } from "@/lib/provider-controls";
 
 // Only consider comments from the last few days — older ones are outside
 // Instagram's private-reply window anyway, so a DM to them would just fail.
@@ -66,6 +67,8 @@ function errMessage(error: unknown): string {
 
 /** One reconciliation pass across every active campaign. */
 export async function reconcileComments(): Promise<void> {
+  if (!areAutomationsEnabled()) return;
+
   const automations = await prisma.automation.findMany({
     where: { isActive: true },
     select: {

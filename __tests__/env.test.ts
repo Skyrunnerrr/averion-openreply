@@ -5,6 +5,10 @@ import {
   isEmailAllowedToSignIn,
   requireEnv,
 } from "../lib/env";
+import {
+  assertProductionSignupPolicy,
+  isSignupPolicyProductionReady,
+} from "../lib/provider-controls";
 
 beforeEach(() => {
   vi.unstubAllEnvs();
@@ -58,5 +62,39 @@ describe("sign-in allowlist", () => {
     expect(isEmailAllowedToSignIn(null)).toBe(false);
     expect(isEmailAllowedToSignIn(undefined)).toBe(false);
     expect(isEmailAllowedToSignIn("")).toBe(false);
+  });
+
+  it("is not production-ready when the AVERION allowlist is empty", () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("OPENREPLY_PROVIDER_PROFILE", "averion");
+    vi.stubEnv("ALLOWED_EMAILS", "");
+    expect(isSignupPolicyProductionReady()).toBe(false);
+    expect(() => assertProductionSignupPolicy()).toThrow(/ALLOWED_EMAILS/);
+    expect(isEmailAllowedToSignIn("anyone@example.com")).toBe(false);
+  });
+
+  it("treats a separator-only allowlist as empty in production", () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("OPENREPLY_PROVIDER_PROFILE", "averion");
+    vi.stubEnv("ALLOWED_EMAILS", "  , ,  ");
+    expect(isSignupPolicyProductionReady()).toBe(false);
+    expect(isEmailAllowedToSignIn("anyone@example.com")).toBe(false);
+  });
+
+  it("is production-ready when the allowlist contains an address", () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("OPENREPLY_PROVIDER_PROFILE", "averion");
+    vi.stubEnv("ALLOWED_EMAILS", "owner@example.com");
+    expect(isSignupPolicyProductionReady()).toBe(true);
+    expect(isEmailAllowedToSignIn("owner@example.com")).toBe(true);
+    expect(isEmailAllowedToSignIn("stranger@example.com")).toBe(false);
+  });
+
+  it("keeps open signup for the upstream profile in production", () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("OPENREPLY_PROVIDER_PROFILE", "upstream");
+    vi.stubEnv("ALLOWED_EMAILS", "");
+    expect(isSignupPolicyProductionReady()).toBe(true);
+    expect(isEmailAllowedToSignIn("anyone@example.com")).toBe(true);
   });
 });
