@@ -43,9 +43,11 @@ COPY . .
 COPY --from=deploy pin-next-build.mjs /tmp/pin-next-build.mjs
 COPY --from=deploy normalize-next-output.mjs /tmp/normalize-next-output.mjs
 RUN node /tmp/pin-next-build.mjs && rm /tmp/pin-next-build.mjs
-RUN grep -q 'api.github.com' /etc/hosts || printf '\n0.0.0.0 api.github.com\n' >> /etc/hosts
 
+# Pinned BuildKit mounts /etc/hosts read-only, so the previous append could not
+# run. --add-host blocks api.github.com for this build step only.
 RUN --mount=type=secret,id=next_server_actions_key,required=true \
+    --add-host=api.github.com:0.0.0.0 \
     set -eu; \
     umask 077; \
     tr -d '\r\n' < /run/secrets/next_server_actions_key > /tmp/sa-key-b64; \
