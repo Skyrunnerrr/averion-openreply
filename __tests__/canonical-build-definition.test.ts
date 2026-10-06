@@ -101,7 +101,7 @@ describe("canonical build definition", () => {
     expect(upgrade).toContain("2026-09-30");
     expect(upgrade).toMatch(/do not install 16\.3\.7/i);
     expect(upgrade).toMatch(/eslint-config-next/);
-    expect(pkg.dependencies.next).toBe("^16.2.6");
-    expect(pkg.devDependencies["eslint-config-next"]).toBe("^16.2.6");
+    expect(pkg.dependencies.next).toBe("16.3.8");
+    expect(pkg.devDependencies["eslint-config-next"]).toBe("16.3.8");
   });
 });

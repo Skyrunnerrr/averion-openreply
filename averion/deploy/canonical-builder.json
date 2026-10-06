@@ -14,7 +14,7 @@
   "CA_CERTIFICATES_VERSION": "20230311+deb12u1",
   "WGET_VERSION": "1.21.3-1+deb12u1",
   "WGET_SHA256": "b389052d1d8a8cacec4f0380d9ee54e8082bfbebe374299be95b5286c9380f80",
-  "LOCKFILE_SHA256": "df7f69b394d4fd22a076448b86a6ef0a489d240259661fd07105e76ade389416",
+  "LOCKFILE_SHA256": "09d2d49964db488a3ca1f543a6919707131a336dce63c62084a8e2654873f6a7",
   "BASE_IMAGE": "docker.io/library/node@sha256:3d0f05455dea2c82e2f76e7e2543964c30f6b7d673fc1a83286736d44fe4c41c",
   "CA_CERT_SOURCE": "snapshot 20260421T000000Z package ca-certificates=20230311+deb12u1. The pinned node base has debian-archive-keyring and no CA bundle. Apt uses HTTP to that snapshot and verifies the signed Release file.",
   "SERVER_ACTION_SECRET_ID": "next_server_actions_key",

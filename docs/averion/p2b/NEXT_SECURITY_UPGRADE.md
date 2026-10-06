@@ -18,3 +18,5 @@ When RC2.2B runs:
 3. Update only those two packages and the lockfile entries they require. No `npm audit fix --force`. No unrelated upgrades.
 4. Run `npm ci`, then the regression matrix in `docs/averion/p2b/NEXT_REGRESSION_MATRIX.md`.
 5. Review Server Actions again after the new build. A new app runtime source SHA is created by that bump. Do not reuse `ea2b1c6e0a88eaeb0fa3daefaf0b0f869bb7566c` as the post-upgrade runtime SHA.
+
+RC2.2B remediation (2026-10-06) pinned exact `next` and `eslint-config-next` to `16.3.8`. 16.3.7 stays rejected. The two unpublished September advisories are not closed by this pin. Image provenance from RC2.2A is not reused as the post-upgrade runtime.
