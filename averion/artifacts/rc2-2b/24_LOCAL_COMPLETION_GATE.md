@@ -1,0 +1,34 @@
+# 24 LOCAL COMPLETION GATE
+
+RUN=AVERION_SOCIAL_OPENREPLY_RC2_2B_LOCAL_COMPLETION_01
+
+FROZEN_PASS is not claimed. This is not a merge, not Wave 3, not a Meta live run, and not a production deploy.
+
+Image source archive: `fe2f1ffee3922e227bb1d12e5d99973560def82f`
+Image manifest: `sha256:dbcdc0b3ce9d1de98098b579e8f5eda18d5dda0a5d6121b1cd783ecbe8f19829`
+Evidence files 01 through 17 were not overwritten.
+
+| Gate | Value |
+| --- | --- |
+| LOCAL_FIXABLE_TEST_GAPS | 0 |
+| UNEXPLAINED_SKIPS | 0 |
+| RC2_2A_IMAGE_CURRENT | YES |
+| IMAGE_NEXT_VERSION | 16.3.8 |
+| BUILD | PASS |
+| LOCAL_RUNTIME_SANITY | PASS |
+| LOCAL_EVIDENCE_MISSING | 0 |
+| LOCAL_FIXABLE_BLOCKERS | 0 |
+| POSTGRES_LOCAL_TEST | PASS |
+| TESTS_AFTER | 346_PASS_0_SKIP |
+| TEST_COVERAGE_GAPS_CLOSED | 8 |
+| TEST_COVERAGE_GAPS_EXTERNAL | 1 |
+| TEST_COVERAGE_GAPS_REMAINING_LOCAL | 0 |
+| UPSTREAM_ADVISORY_PENDING | 2 |
+| PATCH_RANGE_PENDING | 6 |
+| CONFIRMED_VULN | 0 |
+| LOCAL_RC2_2B_COMPLETION | PASS |
+| RC2_2B | HOLD_UPSTREAM_SECURITY_EVIDENCE |
+
+External remainder: live Instagram OAuth (BLOCKED_LIVE_PROVIDER). Unpublished advisories PENDING-CRITICAL-1 and PENDING-HIGH-1, and the six placeholder patched ranges named in `17_RESIDUAL_BLOCKERS.md`, are unchanged. No new advisory was added.
+
+NEXT_ALLOWED_STEP=WAIT_UPSTREAM_DELTA_AND_PREPARE_ARTIFACT_REVIEW
