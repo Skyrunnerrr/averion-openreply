@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, averion/p2b-hardening, cursor/p2b-openreply-deployment-88e3]
   pull_request:
-    branches: [main]
+    branches: [main, averion/p2b-hardening]
 
 jobs:
   test:

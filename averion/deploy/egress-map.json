@@ -1,0 +1,89 @@
+{
+  "schema": "averion.openreply.egress.v1",
+  "upstreamPin": "5760181c4bb9683241357cbbcd8ca635d19f835a",
+  "hardeningBaseSha": "727d364cbc7ac6fb9ce1825c3c43599a0e1a7b10",
+  "appImageSourceSha": "ea2b1c6e0a88eaeb0fa3daefaf0b0f869bb7566c",
+  "deploymentBundleSha": null,
+  "deploymentBundleNote": "The RC2 git commit is bound by the controller dossier. This file does not embed that commit id, and it is not appImageSourceSha.",
+  "enforcement": "DEFERRED_TO_STAGING_INFRA",
+  "enforcementNote": "EGRESS_INVENTORY is this file. EGRESS_ENFORCEMENT is DEFERRED_TO_STAGING_INFRA (ADR B). Docker Compose bridge networks do not filter outbound traffic by destination hostname. This map does not add that filter.",
+  "destinations": [
+    {
+      "host": "graph.instagram.com",
+      "port": 443,
+      "callers": ["lib/meta/client.ts"],
+      "when": "OAuth completion, inbox reads, cron token refresh, and worker sends. Worker job dispatch returns before any send when OPENREPLY_AUTOMATIONS_ENABLED=false. attachPendingNextReels loads pendingNextReel rows and returns before createInstagramContext or getUserMedia while automations are disabled."
+    },
+    {
+      "host": "graph.facebook.com",
+      "port": 443,
+      "callers": ["lib/meta/client.ts debugToken"],
+      "when": "Only the debugToken helper. No route in the ingress matrix calls it."
+    },
+    {
+      "host": "api.instagram.com",
+      "port": 443,
+      "path": "/oauth/access_token",
+      "callers": ["lib/meta/oauth.ts"],
+      "when": "Server-side code exchange after the operator browser returns to /api/instagram/callback. That route is PRIVATE_SERVICE."
+    },
+    {
+      "host": "www.instagram.com",
+      "port": 443,
+      "path": "/oauth/authorize",
+      "callers": ["lib/meta/oauth.ts"],
+      "when": "Browser redirect from /api/instagram/connect. Not a server-side fetch."
+    },
+    {
+      "host": "api.resend.com",
+      "port": 443,
+      "path": "/emails",
+      "callers": ["@auth/core/providers/resend.js"],
+      "when": "Magic-link sign-in when EMAIL_SERVER is unset. Login is PRIVATE_SERVICE."
+    },
+    {
+      "host": "EMAIL_SERVER host",
+      "port": "from the URL",
+      "callers": ["lib/auth.ts nodemailer"],
+      "when": "Used instead of Resend when EMAIL_SERVER is set. Not set in the fail-closed fixture."
+    },
+    {
+      "host": "zernio.com",
+      "port": 443,
+      "path": "/api/v1/*",
+      "callers": ["lib/zernio/client.ts"],
+      "when": "Zernio routes are DENY on every listener, and worker sends do not run while automations are disabled."
+    },
+    {
+      "host": "api.github.com",
+      "port": 443,
+      "path": "/repos/diwenne/openreply",
+      "callers": ["app/page.tsx"],
+      "when": "Server fetch while rendering the marketing home page. That page is DENY, so the public edge does not forward the request that would trigger it."
+    },
+    {
+      "host": "postgres",
+      "port": 5432,
+      "callers": ["web", "worker", "cron via web"],
+      "when": "Compose network only. No host port in averion/deploy/compose.provider.yml."
+    },
+    {
+      "host": "redis",
+      "port": 6379,
+      "callers": ["web", "worker"],
+      "when": "Compose network only. No host port. requirepass from the redis secret."
+    },
+    {
+      "host": "web",
+      "port": 3000,
+      "callers": ["cron", "public-edge"],
+      "when": "CRON_BASE_URL=http://web:3000 on the internal network. public-edge proxies only PUBLIC_REQUIRED requests to http://web:3000 on the edge network. web publishes no host port."
+    },
+    {
+      "host": "/_vercel/insights/script.js",
+      "port": "same origin",
+      "callers": ["app/layout.tsx via @vercel/analytics/next"],
+      "when": "Production mode points at a same-origin path. The ingress policy DENYs /_vercel/*. Development mode would load https://va.vercel-scripts.com, and NODE_ENV=production is required by the readiness gate."
+    }
+  ]
+}

@@ -1,0 +1,222 @@
+{
+  "kind": "PROXY_TEST",
+  "liveInfra": "SIMULATED",
+  "description": "POLICY decisions come from decide(). PROXY_TEST forwards ALLOW to a local upstream and returns 403 for DENY. This file does not start compose and is not the REAL_NETWORK_TEST.",
+  "http": [
+    {
+      "name": "dashboard-direct-dm-ui",
+      "method": "GET",
+      "path": "/inbox",
+      "listener": "public",
+      "expected": "DENIED",
+      "status": 403,
+      "decision": "DENIED",
+      "policy": "DENIED",
+      "pass": true
+    },
+    {
+      "name": "dashboard-home",
+      "method": "GET",
+      "path": "/dashboard",
+      "listener": "public",
+      "expected": "DENIED",
+      "status": 403,
+      "decision": "DENIED",
+      "policy": "DENIED",
+      "pass": true
+    },
+    {
+      "name": "direct-conversations-post",
+      "method": "POST",
+      "path": "/api/instagram/conversations",
+      "listener": "public",
+      "expected": "DENIED",
+      "status": 403,
+      "decision": "DENIED",
+      "policy": "DENIED",
+      "pass": true
+    },
+    {
+      "name": "automation-create",
+      "method": "POST",
+      "path": "/api/automations",
+      "listener": "public",
+      "expected": "DENIED",
+      "status": 403,
+      "decision": "DENIED",
+      "policy": "DENIED",
+      "pass": true
+    },
+    {
+      "name": "automation-patch",
+      "method": "PATCH",
+      "path": "/api/automations",
+      "listener": "public",
+      "expected": "DENIED",
+      "status": 403,
+      "decision": "DENIED",
+      "policy": "DENIED",
+      "pass": true
+    },
+    {
+      "name": "automation-import",
+      "method": "POST",
+      "path": "/api/automations/import",
+      "listener": "public",
+      "expected": "DENIED",
+      "status": 403,
+      "decision": "DENIED",
+      "policy": "DENIED",
+      "pass": true
+    },
+    {
+      "name": "automation-duplicate",
+      "method": "POST",
+      "path": "/api/automations/duplicate",
+      "listener": "public",
+      "expected": "DENIED",
+      "status": 403,
+      "decision": "DENIED",
+      "policy": "DENIED",
+      "pass": true
+    },
+    {
+      "name": "automation-admin-ui",
+      "method": "GET",
+      "path": "/automations/new",
+      "listener": "public",
+      "expected": "DENIED",
+      "status": 403,
+      "decision": "DENIED",
+      "policy": "DENIED",
+      "pass": true
+    },
+    {
+      "name": "private-listener-still-denies-send",
+      "method": "POST",
+      "path": "/api/instagram/conversations",
+      "listener": "private",
+      "expected": "DENIED",
+      "status": 403,
+      "decision": "DENIED",
+      "policy": "DENIED",
+      "pass": true
+    },
+    {
+      "name": "private-listener-still-denies-automation-create",
+      "method": "POST",
+      "path": "/api/automations",
+      "listener": "private",
+      "expected": "DENIED",
+      "status": 403,
+      "decision": "DENIED",
+      "policy": "DENIED",
+      "pass": true
+    },
+    {
+      "name": "polling-guessed-http",
+      "method": "POST",
+      "path": "/api/polling/reconcile",
+      "listener": "public",
+      "expected": "DENIED",
+      "status": 403,
+      "decision": "DENIED",
+      "policy": "DENIED",
+      "pass": true
+    },
+    {
+      "name": "cron-poll-not-public",
+      "method": "GET",
+      "path": "/api/cron/attach-next-reel",
+      "listener": "public",
+      "expected": "DENIED",
+      "status": 403,
+      "decision": "DENIED",
+      "policy": "DENIED",
+      "pass": true
+    },
+    {
+      "name": "zernio-webhook-not-public",
+      "method": "POST",
+      "path": "/api/zernio/webhook/workspace_1",
+      "listener": "public",
+      "expected": "DENIED",
+      "status": 403,
+      "decision": "DENIED",
+      "policy": "DENIED",
+      "pass": true
+    },
+    {
+      "name": "meta-webhook-verify-allowed",
+      "method": "GET",
+      "path": "/api/webhook",
+      "listener": "public",
+      "expected": "ALLOW",
+      "status": 200,
+      "decision": "ALLOW",
+      "policy": "ALLOW",
+      "pass": true
+    },
+    {
+      "name": "meta-webhook-post-allowed",
+      "method": "POST",
+      "path": "/api/webhook",
+      "listener": "public",
+      "expected": "ALLOW",
+      "status": 200,
+      "decision": "ALLOW",
+      "policy": "ALLOW",
+      "pass": true
+    }
+  ],
+  "unreachable": {
+    "worker": {
+      "port": 19090,
+      "reachable": false,
+      "error": "ECONNREFUSED",
+      "expected": "UNREACHABLE",
+      "pass": true
+    },
+    "postgres": {
+      "port": 5432,
+      "reachable": false,
+      "error": "ECONNREFUSED",
+      "expected": "UNREACHABLE",
+      "note": "Host port 5432 is the dev compose publish. This probe is from the deployment host namespace with the provider compose NOT running.",
+      "pass": true
+    },
+    "redis": {
+      "port": 6379,
+      "reachable": false,
+      "error": "ECONNREFUSED",
+      "expected": "UNREACHABLE",
+      "note": "Host port 6379 is the dev compose publish. This probe is from the deployment host namespace with the provider compose NOT running.",
+      "pass": true
+    }
+  },
+  "controls": {
+    "opsHealth": {
+      "status": 200,
+      "decision": "ALLOW",
+      "pass": true
+    },
+    "publicHealth": {
+      "status": 403,
+      "decision": "DENIED",
+      "forwarded": false,
+      "pass": true
+    }
+  },
+  "compose": {
+    "publishesHostPorts": true,
+    "published": [
+      "8080:8080"
+    ],
+    "publishesOnlyPublicEdge": true,
+    "leaksPrivatePorts": false,
+    "pinsProviderDigests": true,
+    "mutableTag": false,
+    "pass": true
+  },
+  "pass": true
+}

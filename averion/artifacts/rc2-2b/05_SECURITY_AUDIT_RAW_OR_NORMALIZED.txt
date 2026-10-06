@@ -1,0 +1,61 @@
+# 05 SECURITY AUDIT — RAW + NORMALIZED
+# Command (box scratch dir containing ONLY package.json + package-lock.json from HEAD 93a793ae; no node_modules; no install):
+#   npm audit --package-lock-only --json      (npm 9.2.0; run 2026-10-06 ~14:50 CEST)
+# Exit code: 1 (vulnerabilities found). Raw JSON: raw/npm_audit.json. stderr: raw/npm_audit.err
+# NOT run: npm audit fix (with or without --force). Installed-tree audit: N/A (no install).
+#
+# CAVEAT: npm audit uses the GitHub *reviewed* global advisory DB. All 7 Sep-30 Next.js GHSAs
+# (cjq9, 4jqv, mcj8, f87g, h694, 3w37, 39w2) return 404 there, so they are ABSENT from this audit.
+# The 2 pending items have no advisory at all. This audit therefore CANNOT close or confirm the 9/9 matrix.
+#
+# metadata.vulnerabilities: info=0 low=2 moderate=6 high=20 critical=4 total=32
+# metadata.dependencies: prod=202 dev=429 optional=134 total=675
+#
+# `next` (direct, critical) range=9.3.4-canary.0 - 16.3.5, fixAvailable=true; via:
+#   GHSA-6gpp-xcg3-4w24 high     >=16.0.0 <16.2.11  Middleware/Proxy bypass (Turbopack, single locale)
+#   GHSA-m99w-x7hq-7vfj high     >=16.0.0 <16.2.11  DoS in App Router using Server Actions
+#   GHSA-89xv-2m56-2m9x high     >=16.0.0 <16.2.11  SSRF in Server Actions on custom servers
+#   GHSA-p9j2-gv94-2wf4 high     >=16.0.0 <16.2.11  SSRF in rewrites
+#   GHSA-68g3-v927-f742 moderate >=16.0.0 <16.2.11  Cache confusion (request bodies)
+#   GHSA-4633-3j49-mh5q moderate >=16.0.0 <16.2.11  Cache confusion (invalid UTF-8 bodies)
+#   GHSA-4c39-4ccg-62r3 moderate >=16.0.0 <16.2.11  Unbounded Server Action payload (Edge)
+#   GHSA-q8wf-6r8g-63ch moderate >=16.0.0 <16.2.11  Image Optimization DoS via SVG
+#   GHSA-955p-x3mx-jcvp moderate >=16.0.0 <16.2.11  Server Function endpoint disclosure
+#   GHSA-p293-qw3h-jr36 critical >=16.0.0 <16.3.3   RCE on Windows-hosted servers
+#   GHSA-2xp9-vwfh-vxw4 critical >=16.0.0 <16.3.3   RCE in Image Optimization (AVIF/libheif)
+#   GHSA-vcvr-r3jv-pc5j critical >=16.2.0 <16.3.6   RCE in next/og ImageResponse (Sep-22 OG)
+#   + via postcss, sharp
+#
+# NORMALIZED (all 32 flagged packages; package<TAB>severity<TAB>direct<TAB>range<TAB>fixAvailable)
+@auth/core	critical	direct=false	range=*	fixAvailable=true
+@auth/prisma-adapter	critical	direct=true	range=<=2.11.2	fixAvailable=true
+next	critical	direct=true	range=9.3.4-canary.0 - 16.3.5	fixAvailable=true
+next-auth	critical	direct=true	range=<=0.0.0-semantically-released || 1.1.0 - 1.5.0 || >=2.0.0-beta.0	fixAvailable=true
+@next/eslint-plugin-next	high	direct=false	range=>=14.3.0-canary.0	fixAvailable=eslint-config-next@14.2.35 semverMajor=true
+@prisma/config	high	direct=false	range=6.13.0-dev.1 - 8.1.0-dev.4	fixAvailable=prisma@6.19.3 semverMajor=true
+brace-expansion	high	direct=false	range=<=1.1.20 || 3.0.0 - 5.0.11	fixAvailable=true
+braces	high	direct=false	range=*	fixAvailable=eslint-config-next@14.2.35 semverMajor=true
+browserslist	high	direct=false	range=<=4.28.6	fixAvailable=true
+deepmerge-ts	high	direct=false	range=<8.0.0	fixAvailable=prisma@6.19.3 semverMajor=true
+eslint-config-next	high	direct=true	range=>=14.3.0-canary.0	fixAvailable=eslint-config-next@14.2.35 semverMajor=true
+fast-glob	high	direct=false	range=*	fixAvailable=eslint-config-next@14.2.35 semverMajor=true
+fast-uri	high	direct=false	range=3.0.0 - 3.1.7	fixAvailable=true
+hono	high	direct=false	range=<=4.13.6	fixAvailable=true
+js-yaml	high	direct=false	range=4.0.0 - 4.3.1	fixAvailable=true
+micromatch	high	direct=false	range=>=0.2.0	fixAvailable=eslint-config-next@14.2.35 semverMajor=true
+mysql2	high	direct=false	range=<=3.23.0	fixAvailable=prisma@6.19.3 semverMajor=true
+nanoid	high	direct=false	range=<=3.3.17	fixAvailable=true
+nodemailer	high	direct=true	range=<=10.0.5	fixAvailable=nodemailer@10.0.15 semverMajor=true
+postcss	high	direct=false	range=<=8.5.22	fixAvailable=true
+prisma	high	direct=true	range=6.13.0-dev.1 - 8.1.0-dev.6	fixAvailable=prisma@6.19.3 semverMajor=true
+sharp	high	direct=false	range=<=0.35.4-rc.0	fixAvailable=true
+source-map-js	high	direct=false	range=1.0.0 - 1.2.1	fixAvailable=true
+vite	high	direct=false	range=8.0.0 - 8.0.15	fixAvailable=true
+@babel/core	low	direct=false	range=<=7.29.0	fixAvailable=true
+esbuild	low	direct=false	range=0.27.3 - 0.28.0	fixAvailable=true
+@hono/node-server	moderate	direct=false	range=<=1.19.14	fixAvailable=prisma@6.19.3 semverMajor=true
+@prisma/dev	moderate	direct=false	range=<=0.24.16	fixAvailable=prisma@6.19.3 semverMajor=true
+@vitest/mocker	moderate	direct=false	range=2.1.0 - 4.1.10	fixAvailable=true
+baseline-browser-mapping	moderate	direct=false	range=>=2.0.0 <2.11.0	fixAvailable=true
+valibot	moderate	direct=false	range=<=1.4.1	fixAvailable=prisma@6.19.3 semverMajor=true
+vitest	moderate	direct=true	range=2.1.0-beta.1 - 4.1.10	fixAvailable=true

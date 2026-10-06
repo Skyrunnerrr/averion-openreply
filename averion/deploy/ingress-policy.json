@@ -1,0 +1,709 @@
+{
+  "schema": "averion.openreply.ingress.v1",
+  "upstreamPin": "5760181c4bb9683241357cbbcd8ca635d19f835a",
+  "hardeningBaseSha": "727d364cbc7ac6fb9ce1825c3c43599a0e1a7b10",
+  "appImageSourceSha": "ea2b1c6e0a88eaeb0fa3daefaf0b0f869bb7566c",
+  "deploymentBundleSha": null,
+  "deploymentBundleNote": "The RC2 git commit is bound by the controller dossier. This file does not embed that commit id, and it is not appImageSourceSha.",
+  "defaultDecision": "DENY",
+  "listeners": {
+    "public": {
+      "accepts": ["PUBLIC_REQUIRED"],
+      "bind": "public edge only"
+    },
+    "private": {
+      "accepts": ["PRIVATE_SERVICE"],
+      "bind": "operator network and compose network, not published on the public edge"
+    },
+    "ops": {
+      "accepts": ["OPS_ONLY"],
+      "bind": "ops network only"
+    }
+  },
+  "routes": [
+    {
+      "id": "meta-webhook-verify",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/api/webhook",
+      "classification": "PUBLIC_REQUIRED",
+      "listeners": ["public"],
+      "source": "app/api/webhook/route.ts",
+      "reason": "Meta hub.challenge verification"
+    },
+    {
+      "id": "meta-webhook-events",
+      "methods": ["POST"],
+      "pattern": "/api/webhook",
+      "classification": "PUBLIC_REQUIRED",
+      "listeners": ["public"],
+      "source": "app/api/webhook/route.ts",
+      "reason": "Meta signed webhook delivery"
+    },
+    {
+      "id": "health",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/api/health",
+      "classification": "OPS_ONLY",
+      "listeners": ["ops"],
+      "source": "app/api/health/route.ts",
+      "reason": "Live dependency and signup-policy probe"
+    },
+    {
+      "id": "admin-diagnostics-api",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/api/admin/diagnostics",
+      "classification": "OPS_ONLY",
+      "listeners": ["ops"],
+      "source": "app/api/admin/diagnostics/route.ts",
+      "reason": "Queue, worker, and failure diagnostics"
+    },
+    {
+      "id": "diagnostics-page",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/diagnostics",
+      "classification": "OPS_ONLY",
+      "listeners": ["ops"],
+      "source": "app/(dashboard)/diagnostics/page.tsx",
+      "reason": "Operator diagnostics page"
+    },
+    {
+      "id": "auth",
+      "methods": ["GET", "HEAD", "POST"],
+      "pattern": "/api/auth/:path*",
+      "classification": "PRIVATE_SERVICE",
+      "listeners": ["private"],
+      "source": "app/api/auth/[...nextauth]/route.ts",
+      "reason": "Magic-link session on the operator network"
+    },
+    {
+      "id": "login",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/login",
+      "classification": "PRIVATE_SERVICE",
+      "listeners": ["private"],
+      "source": "app/login/page.tsx",
+      "reason": "Operator sign-in"
+    },
+    {
+      "id": "verify-request",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/verify-request",
+      "classification": "PRIVATE_SERVICE",
+      "listeners": ["private"],
+      "source": "app/verify-request/page.tsx",
+      "reason": "Magic-link confirmation page"
+    },
+    {
+      "id": "dashboard",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/dashboard",
+      "classification": "PRIVATE_SERVICE",
+      "listeners": ["private"],
+      "source": "app/(dashboard)/dashboard/page.tsx",
+      "reason": "Operator home. Not a public surface."
+    },
+    {
+      "id": "overview",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/overview",
+      "classification": "PRIVATE_SERVICE",
+      "listeners": ["private"],
+      "source": "app/(dashboard)/overview/page.tsx",
+      "reason": "Operator read view"
+    },
+    {
+      "id": "automations-page",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/automations",
+      "classification": "PRIVATE_SERVICE",
+      "listeners": ["private"],
+      "source": "app/(dashboard)/automations/page.tsx",
+      "reason": "Read-only list. Creation UI is a separate DENY route."
+    },
+    {
+      "id": "automations-new-page",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/automations/new",
+      "classification": "DENY",
+      "listeners": [],
+      "source": "app/(dashboard)/automations/new/page.tsx",
+      "reason": "Automation administration UI"
+    },
+    {
+      "id": "campaigns-page",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/campaigns",
+      "classification": "PRIVATE_SERVICE",
+      "listeners": ["private"],
+      "source": "app/(dashboard)/campaigns/page.tsx",
+      "reason": "Read-only campaign list"
+    },
+    {
+      "id": "campaigns-new-page",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/campaigns/new",
+      "classification": "DENY",
+      "listeners": [],
+      "source": "app/(dashboard)/campaigns/new/page.tsx",
+      "reason": "Automation administration UI"
+    },
+    {
+      "id": "campaigns-import-page",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/campaigns/import",
+      "classification": "DENY",
+      "listeners": [],
+      "source": "app/(dashboard)/campaigns/import/page.tsx",
+      "reason": "Automation import UI"
+    },
+    {
+      "id": "campaigns-edit-page",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/campaigns/:id/edit",
+      "classification": "DENY",
+      "listeners": [],
+      "source": "app/(dashboard)/campaigns/[id]/edit/page.tsx",
+      "reason": "Automation administration UI"
+    },
+    {
+      "id": "campaigns-detail-page",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/campaigns/:id",
+      "classification": "PRIVATE_SERVICE",
+      "listeners": ["private"],
+      "source": "app/(dashboard)/campaigns/[id]/page.tsx",
+      "reason": "Read-only campaign detail"
+    },
+    {
+      "id": "inbox-page",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/inbox",
+      "classification": "DENY",
+      "listeners": [],
+      "source": "app/(dashboard)/inbox/page.tsx",
+      "reason": "Human direct-send UI"
+    },
+    {
+      "id": "logs-page",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/logs",
+      "classification": "PRIVATE_SERVICE",
+      "listeners": ["private"],
+      "source": "app/(dashboard)/logs/page.tsx",
+      "reason": "Operator log view"
+    },
+    {
+      "id": "settings-page",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/settings",
+      "classification": "PRIVATE_SERVICE",
+      "listeners": ["private"],
+      "source": "app/(dashboard)/settings/page.tsx",
+      "reason": "Operator settings. Zernio write APIs stay DENY."
+    },
+    {
+      "id": "invite-page",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/invite/:token",
+      "classification": "PRIVATE_SERVICE",
+      "listeners": ["private"],
+      "source": "app/invite/[token]/page.tsx",
+      "reason": "Operator invitation acceptance"
+    },
+    {
+      "id": "marketing-home",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/",
+      "classification": "DENY",
+      "listeners": [],
+      "source": "app/page.tsx",
+      "reason": "Marketing page is not required for the provider data plane"
+    },
+    {
+      "id": "marketing-comment-link",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/comment-link-automation",
+      "classification": "DENY",
+      "listeners": [],
+      "source": "app/comment-link-automation/page.tsx",
+      "reason": "Marketing page"
+    },
+    {
+      "id": "marketing-data-deletion",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/data-deletion",
+      "classification": "DENY",
+      "listeners": [],
+      "source": "app/data-deletion/page.tsx",
+      "reason": "Not a Meta callback. NO_META_LIVE; do not publish app-review pages from this ingress."
+    },
+    {
+      "id": "marketing-ig-templates",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/instagram-comment-to-dm-templates",
+      "classification": "DENY",
+      "listeners": [],
+      "source": "app/instagram-comment-to-dm-templates/page.tsx",
+      "reason": "Marketing page"
+    },
+    {
+      "id": "marketing-agencies",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/instagram-dm-automation-agencies",
+      "classification": "DENY",
+      "listeners": [],
+      "source": "app/instagram-dm-automation-agencies/page.tsx",
+      "reason": "Marketing page"
+    },
+    {
+      "id": "marketing-manychat",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/manychat-alternative",
+      "classification": "DENY",
+      "listeners": [],
+      "source": "app/manychat-alternative/page.tsx",
+      "reason": "Marketing page"
+    },
+    {
+      "id": "marketing-meta-review",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/meta-review",
+      "classification": "DENY",
+      "listeners": [],
+      "source": "app/meta-review/page.tsx",
+      "reason": "Not a Meta callback. NO_META_LIVE."
+    },
+    {
+      "id": "privacy",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/privacy",
+      "classification": "DENY",
+      "listeners": [],
+      "source": "app/privacy/page.tsx",
+      "reason": "Not a Meta callback. NO_META_LIVE."
+    },
+    {
+      "id": "terms",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/terms",
+      "classification": "DENY",
+      "listeners": [],
+      "source": "app/terms/page.tsx",
+      "reason": "Marketing/legal page, not a callback"
+    },
+    {
+      "id": "templates",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/templates",
+      "classification": "DENY",
+      "listeners": [],
+      "source": "app/templates/page.tsx",
+      "reason": "Marketing templates"
+    },
+    {
+      "id": "templates-slug",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/templates/:slug",
+      "classification": "DENY",
+      "listeners": [],
+      "source": "app/templates/[slug]/page.tsx",
+      "reason": "Marketing templates"
+    },
+    {
+      "id": "reports-share",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/reports/:shareSlug",
+      "classification": "DENY",
+      "listeners": [],
+      "source": "app/reports/[shareSlug]/page.tsx",
+      "reason": "Public share page would expose campaign data"
+    },
+    {
+      "id": "tracked-link",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/r/:slug",
+      "classification": "DENY",
+      "listeners": [],
+      "source": "app/r/[slug]/route.ts",
+      "reason": "Public redirect writes click rows. Not a Meta callback."
+    },
+    {
+      "id": "ig-overview",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/api/instagram/overview",
+      "classification": "PRIVATE_SERVICE",
+      "listeners": ["private"],
+      "source": "app/api/instagram/overview/route.ts",
+      "reason": "Operator read"
+    },
+    {
+      "id": "ig-conversations-read",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/api/instagram/conversations",
+      "classification": "PRIVATE_SERVICE",
+      "listeners": ["private"],
+      "source": "app/api/instagram/conversations/route.ts",
+      "reason": "Conversation read. The POST send is a separate DENY route."
+    },
+    {
+      "id": "ig-conversations-send",
+      "methods": ["POST"],
+      "pattern": "/api/instagram/conversations",
+      "classification": "DENY",
+      "listeners": [],
+      "source": "app/api/instagram/conversations/route.ts",
+      "reason": "Human direct-send"
+    },
+    {
+      "id": "ig-conversation-read",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/api/instagram/conversations/:id",
+      "classification": "PRIVATE_SERVICE",
+      "listeners": ["private"],
+      "source": "app/api/instagram/conversations/[id]/route.ts",
+      "reason": "Single conversation read"
+    },
+    {
+      "id": "dashboard-stats",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/api/dashboard/stats",
+      "classification": "PRIVATE_SERVICE",
+      "listeners": ["private"],
+      "source": "app/api/dashboard/stats/route.ts",
+      "reason": "Operator read"
+    },
+    {
+      "id": "automations-read",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/api/automations",
+      "classification": "PRIVATE_SERVICE",
+      "listeners": ["private"],
+      "source": "app/api/automations/route.ts",
+      "reason": "Read existing automations. Mutations are DENY."
+    },
+    {
+      "id": "automations-create",
+      "methods": ["POST"],
+      "pattern": "/api/automations",
+      "classification": "DENY",
+      "listeners": [],
+      "source": "app/api/automations/route.ts",
+      "reason": "Automation creation"
+    },
+    {
+      "id": "automations-patch",
+      "methods": ["PATCH"],
+      "pattern": "/api/automations",
+      "classification": "DENY",
+      "listeners": [],
+      "source": "app/api/automations/route.ts",
+      "reason": "Automation update and trigger control"
+    },
+    {
+      "id": "automations-delete",
+      "methods": ["DELETE"],
+      "pattern": "/api/automations",
+      "classification": "DENY",
+      "listeners": [],
+      "source": "app/api/automations/route.ts",
+      "reason": "Automation deletion"
+    },
+    {
+      "id": "automations-import",
+      "methods": ["POST"],
+      "pattern": "/api/automations/import",
+      "classification": "DENY",
+      "listeners": [],
+      "source": "app/api/automations/import/route.ts",
+      "reason": "Automation import"
+    },
+    {
+      "id": "automations-duplicate",
+      "methods": ["POST"],
+      "pattern": "/api/automations/duplicate",
+      "classification": "DENY",
+      "listeners": [],
+      "source": "app/api/automations/duplicate/route.ts",
+      "reason": "Automation duplication"
+    },
+    {
+      "id": "zernio-webhook",
+      "methods": ["POST"],
+      "pattern": "/api/zernio/webhook/:workspaceId",
+      "classification": "DENY",
+      "listeners": [],
+      "source": "app/api/zernio/webhook/[workspaceId]/route.ts",
+      "reason": "Alternate provider callback. Not required for AVERION Meta. NO_AVERION_ADAPTER."
+    },
+    {
+      "id": "zernio-connect",
+      "methods": ["POST"],
+      "pattern": "/api/zernio/connect",
+      "classification": "DENY",
+      "listeners": [],
+      "source": "app/api/zernio/connect/route.ts",
+      "reason": "Zernio connect starts an external account link"
+    },
+    {
+      "id": "zernio-settings",
+      "methods": ["GET", "HEAD", "POST", "PUT", "DELETE"],
+      "pattern": "/api/zernio/settings",
+      "classification": "DENY",
+      "listeners": [],
+      "source": "app/api/zernio/settings/route.ts",
+      "reason": "Zernio credential administration"
+    },
+    {
+      "id": "zernio-accounts",
+      "methods": ["POST"],
+      "pattern": "/api/zernio/accounts",
+      "classification": "DENY",
+      "listeners": [],
+      "source": "app/api/zernio/accounts/route.ts",
+      "reason": "Zernio account import"
+    },
+    {
+      "id": "workspace-members-read",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/api/workspace/members",
+      "classification": "PRIVATE_SERVICE",
+      "listeners": ["private"],
+      "source": "app/api/workspace/members/route.ts",
+      "reason": "Operator membership read"
+    },
+    {
+      "id": "workspace-members-write",
+      "methods": ["POST", "PATCH", "DELETE"],
+      "pattern": "/api/workspace/members",
+      "classification": "PRIVATE_SERVICE",
+      "listeners": ["private"],
+      "source": "app/api/workspace/members/route.ts",
+      "reason": "Operator membership changes stay off the public edge"
+    },
+    {
+      "id": "workspace-invite-accept",
+      "methods": ["POST"],
+      "pattern": "/api/workspace/invitations/accept",
+      "classification": "PRIVATE_SERVICE",
+      "listeners": ["private"],
+      "source": "app/api/workspace/invitations/accept/route.ts",
+      "reason": "Operator invitation accept"
+    },
+    {
+      "id": "ig-connect",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/api/instagram/connect",
+      "classification": "PRIVATE_SERVICE",
+      "listeners": ["private"],
+      "source": "app/api/instagram/connect/route.ts",
+      "reason": "Operator browser starts OAuth. Meta servers do not call this."
+    },
+    {
+      "id": "ig-callback",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/api/instagram/callback",
+      "classification": "PRIVATE_SERVICE",
+      "listeners": ["private"],
+      "source": "app/api/instagram/callback/route.ts",
+      "reason": "OAuth redirect returns to the operator browser, not as a Meta server callback"
+    },
+    {
+      "id": "ig-posts",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/api/instagram/posts",
+      "classification": "PRIVATE_SERVICE",
+      "listeners": ["private"],
+      "source": "app/api/instagram/posts/route.ts",
+      "reason": "Operator read"
+    },
+    {
+      "id": "ig-profile",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/api/instagram/profile",
+      "classification": "PRIVATE_SERVICE",
+      "listeners": ["private"],
+      "source": "app/api/instagram/profile/route.ts",
+      "reason": "Operator read"
+    },
+    {
+      "id": "ig-accounts",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/api/instagram/accounts",
+      "classification": "PRIVATE_SERVICE",
+      "listeners": ["private"],
+      "source": "app/api/instagram/accounts/route.ts",
+      "reason": "Operator read"
+    },
+    {
+      "id": "ig-disconnect",
+      "methods": ["POST"],
+      "pattern": "/api/instagram/disconnect",
+      "classification": "PRIVATE_SERVICE",
+      "listeners": ["private"],
+      "source": "app/api/instagram/disconnect/route.ts",
+      "reason": "Operator account disconnect. Not public."
+    },
+    {
+      "id": "logs-api",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/api/logs",
+      "classification": "PRIVATE_SERVICE",
+      "listeners": ["private"],
+      "source": "app/api/logs/route.ts",
+      "reason": "Operator read"
+    },
+    {
+      "id": "cron-refresh-tokens",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/api/cron/refresh-tokens",
+      "classification": "PRIVATE_SERVICE",
+      "listeners": ["private"],
+      "source": "app/api/cron/refresh-tokens/route.ts",
+      "reason": "Called by the cron container on the compose network. Bearer CRON_SECRET."
+    },
+    {
+      "id": "cron-attach-next-reel",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/api/cron/attach-next-reel",
+      "classification": "PRIVATE_SERVICE",
+      "listeners": ["private"],
+      "source": "app/api/cron/attach-next-reel/route.ts",
+      "reason": "Internal scheduler only"
+    },
+    {
+      "id": "cron-snapshot-followers",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/api/cron/snapshot-followers",
+      "classification": "PRIVATE_SERVICE",
+      "listeners": ["private"],
+      "source": "app/api/cron/snapshot-followers/route.ts",
+      "reason": "Internal scheduler only"
+    },
+    {
+      "id": "next-static",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/_next/:path*",
+      "classification": "PRIVATE_SERVICE",
+      "listeners": ["private"],
+      "source": "next:runtime",
+      "reason": "Dashboard assets on the operator network only"
+    },
+    {
+      "id": "vercel-insights",
+      "methods": ["GET", "HEAD", "POST"],
+      "pattern": "/_vercel/:path*",
+      "classification": "DENY",
+      "listeners": [],
+      "source": "next:runtime",
+      "reason": "app/layout.tsx injects /_vercel/insights/script.js. Deny it so the browser does not load analytics."
+    },
+    {
+      "id": "asset-font",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/fonts/:path*",
+      "classification": "PRIVATE_SERVICE",
+      "listeners": ["private"],
+      "source": "public/fonts/geist-latin.woff2",
+      "reason": "Operator UI font"
+    },
+    {
+      "id": "asset-icon-192",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/icon-192.png",
+      "classification": "PRIVATE_SERVICE",
+      "listeners": ["private"],
+      "source": "public/icon-192.png",
+      "reason": "Operator UI icon"
+    },
+    {
+      "id": "asset-icon-512",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/icon-512.png",
+      "classification": "PRIVATE_SERVICE",
+      "listeners": ["private"],
+      "source": "public/icon-512.png",
+      "reason": "Operator UI icon"
+    },
+    {
+      "id": "asset-apple-touch",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/apple-touch-icon.png",
+      "classification": "PRIVATE_SERVICE",
+      "listeners": ["private"],
+      "source": "public/apple-touch-icon.png",
+      "reason": "Operator UI icon"
+    },
+    {
+      "id": "asset-brand",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/brand/:path*",
+      "classification": "DENY",
+      "listeners": [],
+      "source": "public/brand/zernio-primary.svg",
+      "reason": "Marketing/brand asset"
+    },
+    {
+      "id": "asset-file-svg",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/file.svg",
+      "classification": "DENY",
+      "listeners": [],
+      "source": "public/file.svg",
+      "reason": "Unused marketing asset"
+    },
+    {
+      "id": "asset-globe",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/globe.svg",
+      "classification": "DENY",
+      "listeners": [],
+      "source": "public/globe.svg",
+      "reason": "Unused marketing asset"
+    },
+    {
+      "id": "asset-next-svg",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/next.svg",
+      "classification": "DENY",
+      "listeners": [],
+      "source": "public/next.svg",
+      "reason": "Unused marketing asset"
+    },
+    {
+      "id": "asset-star-history",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/star-history.png",
+      "classification": "DENY",
+      "listeners": [],
+      "source": "public/star-history.png",
+      "reason": "Marketing asset"
+    },
+    {
+      "id": "asset-vercel",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/vercel.svg",
+      "classification": "DENY",
+      "listeners": [],
+      "source": "public/vercel.svg",
+      "reason": "Marketing asset"
+    },
+    {
+      "id": "asset-window",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/window.svg",
+      "classification": "DENY",
+      "listeners": [],
+      "source": "public/window.svg",
+      "reason": "Unused marketing asset"
+    },
+    {
+      "id": "font-license",
+      "methods": ["GET", "HEAD"],
+      "pattern": "/fonts/Geist-LICENSE.txt",
+      "classification": "PRIVATE_SERVICE",
+      "listeners": ["private"],
+      "source": "public/fonts/Geist-LICENSE.txt",
+      "reason": "Font license text served with the operator UI font"
+    }
+  ]
+}

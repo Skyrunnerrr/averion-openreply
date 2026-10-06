@@ -1,4 +1,8 @@
 import { EMAIL_PROVIDER_ID, signIn } from "@/lib/auth";
+import {
+  prepareMagicLinkSubmission,
+  resolveMagicLinkCallbackUrl,
+} from "@/lib/auth/callback-url";
 import { getI18n } from "@/lib/i18n/server";
 import { getCampaignTemplate } from "@/lib/templates/campaign-templates";
 import { DemoNotice } from "@/components/demo-notice";
@@ -59,13 +63,24 @@ export default async function LoginPage({
   const templateCallbackUrl = selectedTemplate
     ? `/campaigns/new?template=${selectedTemplate.slug}`
     : null;
-  const callbackUrl = params.callbackUrl ?? templateCallbackUrl ?? "/dashboard";
+  let callbackUrl = "/dashboard";
+  try {
+    callbackUrl = resolveMagicLinkCallbackUrl(
+      params.callbackUrl ?? templateCallbackUrl,
+    );
+  } catch {
+    callbackUrl = "/dashboard";
+  }
 
   async function sendMagicLink(formData: FormData) {
     "use server";
+    const submission = prepareMagicLinkSubmission({
+      email: formData.get("email"),
+      callbackUrl,
+    });
     await signIn(EMAIL_PROVIDER_ID, {
-      email: String(formData.get("email") ?? ""),
-      redirectTo: callbackUrl,
+      email: submission.email,
+      redirectTo: submission.redirectTo,
     });
   }
 

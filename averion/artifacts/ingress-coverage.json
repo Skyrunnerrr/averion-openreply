@@ -1,0 +1,30 @@
+{
+  "appFiles": 56,
+  "publicFiles": 12,
+  "routes": 76,
+  "missingApp": [],
+  "missingPublic": [],
+  "dangling": [],
+  "publicRequired": [
+    {
+      "id": "meta-webhook-verify",
+      "methods": [
+        "GET",
+        "HEAD"
+      ],
+      "pattern": "/api/webhook"
+    },
+    {
+      "id": "meta-webhook-events",
+      "methods": [
+        "POST"
+      ],
+      "pattern": "/api/webhook"
+    }
+  ],
+  "publicRequiredOk": true,
+  "adminDenied": true,
+  "listenerConsistency": true,
+  "classOk": true,
+  "pass": true
+}
